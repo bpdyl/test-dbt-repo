@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_GRP_LU
+    description: "Staging view for Product Group Lookup Table"
+    columns:
+      - name: GRP_ID
+        description: "Unique identifier in the source system for the Group. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: GRP_NUM
+        description: "Identifier for the Group displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: GRP_DESC 
+        description: "Description for the Group."

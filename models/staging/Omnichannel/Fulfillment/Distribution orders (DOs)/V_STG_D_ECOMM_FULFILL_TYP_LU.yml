@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_ECOMM_FULFILL_TYP_LU
+    description: "Staging view for eCommerce Fulfillment Type"
+    columns:
+      - name: FULFILL_TYP
+        description: "The fulfillment type, such as 'Ship to Store', 'Ship to Home', or 'BOPIS'."
+        tests:
+          - unique
+          - not_null
+      - name: FULFILL_TYP_DESC
+        description: "Description for the fulfillment type, such as 'Ship to Store', 'Ship to Home', or 'BOPIS'."
+      - name: FULFILL_METHOD
+        description: "The fulfillment method, which groups fulfillment types into categories such as adding ship-from-store and ship-from-warehouse into ship-to-home."
+      - name: FULFILL_METHOD_DESC
+        description: "Description for the fulfillment method, which groups fulfillment types into categories such as adding ship-from-store and ship-from-warehouse into ship-to-home."

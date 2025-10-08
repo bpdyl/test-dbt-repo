@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: DWH_D_ECOMM_FULFILL_TYP_LU
+    tags: ['d_ecomm_fulfill_typ_ld']
+    description: "Fact table for customer fulfillment type detail."
+    data_tests:
+      - robling_product.run_general_integrity_checks: ## Actual name of the test.
+          name: general_data_integrity_checks # Human friendly name for the test.
+          primary_key_columns: ["FULFILL_TYP"]
+          key_fields:
+              - FULFILL_TYP_DESC
+              - FULFILL_METHOD
+              - FULFILL_METHOD_DESC
+          config:
+              severity: warn
+              custom_test: true
+              sub_area_name: "Fulfillment" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+              table_name_to_test: "DWH_D_ECOMM_FULFILL_TYP_LU"

@@ -1,0 +1,25 @@
+{# Note: following macro is called to switch between source
+and source_chg and it is applicable for robling product only.
+It ensures that first load in daily batch is done using _LND schema
+and second load in daily batch is done using _LND_CHG schema#}
+{% set curr_day = robling_product.get_business_date() | string | trim %}
+{% set src_name = select_stg_source(
+    base_source_name = 'PRD_UDA_STG_SRC',
+    curr_day = curr_day,
+    switch_date = '2023-12-28'
+) %}
+
+{{ config(
+    materialized='view',
+    alias='V_STG_D_PRD_UDA_ITM_MTX',
+    schema='DW_STG_V',
+    tags=['d_prd_uda_itm_mtx_ld']
+) }}
+
+SELECT
+     TRIM(UDA_ITM.ITM_ID)                                                   AS ITM_ID
+    ,TRIM(UDA_ITM.UDA_ID)                                                   AS UDA_ID
+    ,TRIM(UDA_ITM.UDA_VALUE)                                                AS UDA_VALUE
+    ,TRIM(UDA_ITM.UDA_VALUE_DESC)                                           AS UDA_VALUE_DESC
+    ,TRIM(UDA_ITM.UDA_DESC)                                                 AS UDA_DESC
+FROM {{ source(src_name, 'LND_D_PRD_UDA_ITM_MTX') }} UDA_ITM

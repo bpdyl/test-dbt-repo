@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: V_STG_RIG_F_INV_ELGBL_IL_B
+    description: "Fact table for Item-Location eligibility. "
+    columns:
+      - name: LOC_ID
+        description: "Unique identifier in the source system for the Location. The Robling ETL will join on this column."
+        tests:
+          - not_null
+
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item. The Robling ETL will join on this column."
+        tests:
+          - not_null
+
+      - name: ELGBL_EFF_START_DT
+        description: "Date when this item becomes eligible at this location. Defaults to FIRST_ITM_LOC_OH_DT if not provided."
+
+      - name: ELGBL_EFF_END_DT
+        description: "Date when this item is no longer eligible at this location. Defaults to LAST_ITM_LOC_SLS_DT + 28 days if not provided."
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [ITM_ID, LOC_ID]

@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: V_STG_F_ECOMM_CO_LN_ITM_B
+    description: "Staging view for eCommerce Customer Order Line Item"
+    columns:
+      - name: CO_LN_ID
+        description: "Unique identifier in the source system for the ecomm Customer Order Line. The Robling ETL will join on this column."
+        tests:
+          - not_null
+      - name: CO_ID
+        description: "Unique identifier in the source system for the ecomm Customer Order. The Robling ETL will join on this column."
+        tests:
+          - not_null
+      - name: CO_LN_NUM
+        description: "Identifier for the ecomm Customer Order Line displayed to users and reports. May or may not be the same as the ID."
+      - name: DMND_LOC_ID
+        description: "Unique identifier in the source system for the location where the order was placed. The Robling ETL will join on this column."
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the item ordered. The Robling ETL will join on this column."
+      - name: CO_LN_ITM_STTS
+        description: "Code or Description of the Customer Order line-item status, such as ordered, backordered, fulfilled, canceled, etc."
+      - name: BOPIS_FLG
+        description: "Yes/No field indicating whether the Order is BOPIS (Buy Online Pickup In Store) or not."
+      - name: RTRN_FLG
+        description: "Indicates whether the transaction is a return or a sale."
+      - name: CO_ORD_TS
+        description: "Timestamp when the customer order is officially considered demand, usually upon order check out."
+      - name: F_CO_ORD_QTY
+        description: "Quantity (in units) of product initially ordered in the Customer Order (CO)."
+      - name: DO_CREATED_TS
+        description: "Timestamp when the first Distribution Order (DO) is released. The demand is considered allocated as of this time."
+      - name: F_CO_ALLOCATED_QTY
+        description: "Quantity (in units) of product for which there is a non-rejected DO (fulfillment) for this order line item."
+      - name: BACK_ORD_TS
+        description: "Timestamp when this line item first went into backorder status."
+      - name: F_CO_BACK_ORD_QTY
+        description: "Quantity (in units) of product that has been in backorder status at some point for this order line item."
+      - name: INVOICE_TS
+        description: "Timestamp when the order line item was first invoiced."
+      - name: F_CO_FULFILL_QTY
+        description: "Quantity (in units) of product that has been fulfilled for this order line item."
+      - name: CANCLD_TS
+        description: "Timestamp when the order line item was first cancelled."
+      - name: CANCLD_RSN
+        description: "Code or Description of the Customer Order cancel reason."
+      - name: F_CO_CANCLD_QTY
+        description: "Quantity (in units) of product that has been cancelled for this order line item."
+      - name: RTRN_TS
+        description: "Timestamp when the order line item was first returned."
+      - name: RTRN_RSN
+        description: "Code or Description of the Customer Order cancel reason."
+      - name: F_CO_RTRN_QTY
+        description: "Quantity (in units) of product that has been returned for this order line item."
+      - name: DLVRY_TYP
+        description: "Code or Description of the delivery type, such as overnight, ground, two-day, etc.."
+      - name: DLVRY_CITY
+        description: "City where the product will be delivered."
+      - name: DLVRY_STATE
+        description: "State where the product will be delivered."
+      - name: DLVRY_POSTAL_CDE
+        description: "Postal code where the product will be delivered."
+      - name: DLVRY_COUNTRY_CDE
+        description: "Country where the product will be delivered."
+      - name: F_CO_ORIG_UNIT_RTL_LCL
+        description: "Retail price for the item before discounts, not including taxes, in local currency."
+      - name: F_CO_PAID_UNIT_RTL_LCL
+        description: "Retail price for the item after discounts, not including taxes, in local currency."
+      - name: F_CO_ORD_RTL_LCL
+        description: "Amount paid by the customer for product ordered in the Customer Order (CO), net of discounts and not including shipping or taxes, in local currency."
+      - name: F_CO_DSC_AMT_LCL
+        description: "Discount applied to the retail price, resulting in the price paid by the customer, in local currency."
+      - name: F_CO_TAX_AMT_LCL
+        description: "Tax amount applied to the amount ordered by the customer, in local currency."
+      - name: F_CO_LN_ADDTNL_CHRGS_LCL
+        description: "Additional operational charges taken (apart from shipping and tax charges) for customer order line, in local currency."
+      - name: F_CO_LN_ORD_TOT_AMT_LCL
+        description: "Total amount in an order for customer line, including all charges such as S&H, In local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code."
+      - name: SRC_UPD_TS
+        description: "Timestamp when this record was last modified at the source system."
+      - name: IS_DELETED
+        description: "Indicates whether this record is marked as deleted at the source."
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [CO_LN_ID, CO_ID]

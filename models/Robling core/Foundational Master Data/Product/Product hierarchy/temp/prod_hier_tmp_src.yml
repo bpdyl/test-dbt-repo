@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: PROD_HIER_TMP_SRC
+    schema: DW_STG_V
+    tables:
+      - name: V_STG_D_PRD_DIV_LU
+      - name: V_STG_D_PRD_GRP_LU
+      - name: V_STG_D_PRD_DPT_LU
+      - name: V_STG_D_PRD_CLS_LU
+      - name: V_STG_D_PRD_SBC_LU
+      - name: V_STG_D_PRD_STY_LU
+      - name: V_STG_D_PRD_COLOR_LU

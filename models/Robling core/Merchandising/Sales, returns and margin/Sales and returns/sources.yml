@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+    - name: SLS_RECON_SRC_STG
+      schema: DW_STG_V
+      tables:
+        - name: V_RECON_F_SLS_TXN_LN_ITM_B
+        - name: V_STG_F_SLS_TXN_LN_ITM_B
+
+    - name: SLS_RECON_SRC_DWH
+      schema: DW_DWH_V
+      tables:
+        - name: V_DWH_F_SLS_TXN_LN_ITM_B
+
+    - name: SLS_RECON_SRC_DM
+      schema: DM_MERCH
+      tables:
+        - name: DM_F_MEAS_FACT_ILD_B
+    
+    - name: SLS_SRC_DM
+      schema: DW_DWH_V
+      tables:
+        - name: V_DWH_F_SLS_TXN_LN_ITM_B
+        - name: V_DWH_F_SLS_TXN_ATTR_LU
+
+    - name: SLS_UPD_SRC_DWH
+      schema: DW_DWH_v
+      tables: 
+        - name: V_DWH_F_SLS_TXN_LN_ITM_B
+    
+    - name: SLS_UPD_SRC_TMP
+      schema: DW_TMP
+      tables: 
+        - name: TMP_F_SLS_TXN_LN_ITM_B
+

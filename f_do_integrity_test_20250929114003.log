@@ -1,0 +1,533 @@
+[0m09:21:58  Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F849D8B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F97B4160>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F97B40A0>]}
+[0m09:21:58  Running with dbt=1.10.9
+[0m09:21:58  running dbt with arguments {'warn_error': 'None', 'quiet': 'False', 'profiles_dir': 'C:\\Drive_D\\Robling\\roblingdbt', 'use_experimental_parser': 'False', 'invocation_command': 'dbt -d test --select DWH_F_ECOMM_DO_LN_ITM_B', 'log_path': 'C:\\Drive_D\\Robling\\roblingdbt\\logs', 'log_format': 'default', 'write_json': 'True', 'indirect_selection': 'eager', 'cache_selected_only': 'False', 'target_path': 'None', 'empty': 'None', 'printer_width': '80', 'use_colors': 'True', 'introspect': 'True', 'fail_fast': 'False', 'log_cache_events': 'False', 'send_anonymous_usage_stats': 'True', 'partial_parse': 'True', 'static_parser': 'True', 'debug': 'True', 'version_check': 'True', 'no_print': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])'}
+[0m09:22:00  Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F8EBDFA0>]}
+[0m09:22:00  Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F976C550>]}
+[0m09:22:00  Registered adapter: snowflake=1.9.1
+[0m09:22:01  checksum: 6543b8b248ceda473ef0d611849d5d909085b6b714afa9b515e9635faea7af23, vars: {}, profile: , target: , version: 1.10.9
+[0m09:22:01  Unable to do partial parsing because profile has changed
+[0m09:22:01  Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F888B4C0>]}
+[0m09:22:07  [[33mWARNING[0m][MissingArgumentsPropertyInGenericTestDeprecation]: Deprecated
+functionality
+Found top-level arguments to test
+`robling_product.run_general_integrity_checks`. Arguments to generic tests
+should be nested under the `arguments` property.`
+[0m09:22:07  Sending event: {'category': 'dbt', 'action': 'deprecation', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'property_': 'warn', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002099AC76970>]}
+[0m09:22:08  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.robling_product.Staging
+[0m09:22:08  Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F97264C0>]}
+[0m09:22:09  Wrote artifact WritableManifest to C:\Drive_D\Robling\roblingdbt\target\manifest.json
+[0m09:22:09  Wrote artifact SemanticManifest to C:\Drive_D\Robling\roblingdbt\target\semantic_manifest.json
+[0m09:22:09  Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002099A4F72E0>]}
+[0m09:22:09  Found 172 models, 1 operation, 83 data tests, 120 sources, 635 macros
+[0m09:22:09  Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002099A6F8640>]}
+[0m09:22:09  
+[0m09:22:09  Concurrency: 1 threads (target='dev')
+[0m09:22:09  
+[0m09:22:09  Acquiring new snowflake connection 'master'
+[0m09:22:09  Acquiring new snowflake connection 'list_ROBLING_DEV_DBT_DB_DW_STG_V'
+[0m09:22:09  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_STG_V"
+[0m09:22:09  On list_ROBLING_DEV_DBT_DB_DW_STG_V: show objects in ROBLING_DEV_DBT_DB.DW_STG_V limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:09  Opening a new connection, currently in state init
+Creds: SnowflakeCredentials(database='ROBLING_DEV_DBT_DB', schema='DW_DWH', account='robling-partner.east-us-2.azure', user='BPAUDYAL', warehouse='ROBLING_DEV_TEST_USR_WH', role='ROBLING_DEV_SYSADMIN_FR', password='bpSnowFlake@123', authenticator=None, private_key='', private_key_path='', private_key_passphrase='', token=None, oauth_client_id=None, oauth_client_secret=None, query_tag=None, client_session_keep_alive=False, host=None, port=None, proxy_host=None, proxy_port=None, protocol=None, connect_retries=1, connect_timeout=None, retry_on_database_errors=False, retry_all=False, insecure_mode=False, reuse_connections=True)
+[0m09:22:22  SQL status: SUCCESS 78 in 12.943 seconds
+[0m09:22:22  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_STG_V, now list_ROBLING_DEV_DBT_DB_DW_RIG)
+[0m09:22:22  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_RIG"
+[0m09:22:22  On list_ROBLING_DEV_DBT_DB_DW_RIG: show objects in ROBLING_DEV_DBT_DB.DW_RIG limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:23  SQL status: SUCCESS 16 in 0.539 seconds
+[0m09:22:23  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_RIG, now list_ROBLING_DEV_DBT_DB_DM_MERCH_V)
+[0m09:22:23  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DM_MERCH_V"
+[0m09:22:23  On list_ROBLING_DEV_DBT_DB_DM_MERCH_V: show objects in ROBLING_DEV_DBT_DB.DM_MERCH_V limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:23  SQL status: SUCCESS 49 in 0.456 seconds
+[0m09:22:23  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DM_MERCH_V, now list_ROBLING_DEV_DBT_DB_DM_MERCH)
+[0m09:22:23  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DM_MERCH"
+[0m09:22:23  On list_ROBLING_DEV_DBT_DB_DM_MERCH: show objects in ROBLING_DEV_DBT_DB.DM_MERCH limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:24  SQL status: SUCCESS 26 in 0.483 seconds
+[0m09:22:24  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DM_MERCH, now list_ROBLING_DEV_DBT_DB_DW_DWH)
+[0m09:22:24  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_DWH"
+[0m09:22:24  On list_ROBLING_DEV_DBT_DB_DW_DWH: show objects in ROBLING_DEV_DBT_DB.DW_DWH limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:24  SQL status: SUCCESS 150 in 0.498 seconds
+[0m09:22:24  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_DWH, now list_ROBLING_DEV_DBT_DB_DW_TMP)
+[0m09:22:24  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_TMP"
+[0m09:22:24  On list_ROBLING_DEV_DBT_DB_DW_TMP: show objects in ROBLING_DEV_DBT_DB.DW_TMP limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:25  SQL status: SUCCESS 81 in 0.444 seconds
+[0m09:22:25  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_TMP, now list_ROBLING_DEV_DBT_DB_DW_DWH_V)
+[0m09:22:25  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_DWH_V"
+[0m09:22:25  On list_ROBLING_DEV_DBT_DB_DW_DWH_V: show objects in ROBLING_DEV_DBT_DB.DW_DWH_V limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:26  SQL status: SUCCESS 77 in 0.877 seconds
+[0m09:22:26  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_DWH_V, now list_ROBLING_DEV_DBT_DB_DW_RIG_V)
+[0m09:22:26  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_RIG_V"
+[0m09:22:26  On list_ROBLING_DEV_DBT_DB_DW_RIG_V: show objects in ROBLING_DEV_DBT_DB.DW_RIG_V limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:26  SQL status: SUCCESS 5 in 0.422 seconds
+[0m09:22:26  Re-using an available connection from the pool (formerly list_ROBLING_DEV_DBT_DB_DW_RIG_V, now list_ROBLING_DEV_DBT_DB_DW_CFG)
+[0m09:22:26  Using snowflake connection "list_ROBLING_DEV_DBT_DB_DW_CFG"
+[0m09:22:26  On list_ROBLING_DEV_DBT_DB_DW_CFG: show objects in ROBLING_DEV_DBT_DB.DW_CFG limit 10000
+/* Query executed by Robling DBT framework */;
+[0m09:22:27  SQL status: SUCCESS 12 in 0.411 seconds
+[0m09:22:27  Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '2c26af1c-ef53-43d3-8c11-db16c7402a75', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002099A6F8250>]}
+[0m09:22:27  Began running node test.robling_product.check_missing_fulfillment_cost.fd9e140997
+[0m09:22:27  1 of 2 START test check_missing_fulfillment_cost ............................... [RUN]
+[0m09:22:27  Acquiring new snowflake connection 'test.robling_product.check_missing_fulfillment_cost.fd9e140997'
+[0m09:22:27  Began compiling node test.robling_product.check_missing_fulfillment_cost.fd9e140997
+[0m09:22:27  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:27  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: -- Purpose: Retrieve the current business date from the DWH_C_PARAM table
+        SELECT TO_DATE(PARAM_VALUE) AS CURR_DAY
+        FROM DW_DWH_V.V_DWH_C_PARAM
+        WHERE PARAM_NAME = 'CURR_DAY'
+/* Query executed by Robling DBT framework */
+[0m09:22:27  Opening a new connection, currently in state init
+Creds: SnowflakeCredentials(database='ROBLING_DEV_DBT_DB', schema='DW_DWH', account='robling-partner.east-us-2.azure', user='BPAUDYAL', warehouse='ROBLING_DEV_TEST_USR_WH', role='ROBLING_DEV_SYSADMIN_FR', password='bpSnowFlake@123', authenticator=None, private_key='', private_key_path='', private_key_passphrase='', token=None, oauth_client_id=None, oauth_client_secret=None, query_tag=None, client_session_keep_alive=False, host=None, port=None, proxy_host=None, proxy_port=None, protocol=None, connect_retries=1, connect_timeout=None, retry_on_database_errors=False, retry_all=False, insecure_mode=False, reuse_connections=True)
+[0m09:22:34  SQL status: SUCCESS 1 in 7.086 seconds
+[0m09:22:34  Writing injected SQL for node "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:34  Began executing node test.robling_product.check_missing_fulfillment_cost.fd9e140997
+[0m09:22:34  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:34  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: -- Purpose: Retrieve the current business date from the DWH_C_PARAM table
+        SELECT TO_DATE(PARAM_VALUE) AS CURR_DAY
+        FROM DW_DWH_V.V_DWH_C_PARAM
+        WHERE PARAM_NAME = 'CURR_DAY'
+/* Query executed by Robling DBT framework */
+[0m09:22:34  SQL status: SUCCESS 1 in 0.426 seconds
+[0m09:22:34    Deleting existing records from ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK for current run...
+[0m09:22:34  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:34  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: DELETE FROM ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+        WHERE LOAD_DT = '2023-12-28'
+            AND SUB_AREA_NAME = 'Fulfillment'
+            AND TABLE_NAME = 'DWH_F_ECOMM_DO_LN_ITM_B'
+            
+            AND TEST_DESC IN (
+                
+                    'Check for Fulfillment data for which cost wasn''t found by the ETL'
+                    
+                
+            )
+            
+/* Query executed by Robling DBT framework */;
+[0m09:22:36  SQL status: SUCCESS 0 in 1.204 seconds
+[0m09:22:36    Delete statement executed.
+[0m09:22:36  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:36  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: create or replace temporary table ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+         as
+        (
+-- First, get the total row count of the model/table being tested.
+    WITH total_rows AS (SELECT COUNT(*) as ROW_CNT FROM ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_ECOMM_DO_LN_ITM_B),
+    -- Then, create a CTE for each custom SQL test
+    -- that was provided in the YAML configuration.
+    
+    test_1 AS (
+        -- Apply where condition to each custom test if specified-- The user-provided SQL must return a single row with a single integer value,
+        -- representing the count of records violating the test condition.
+        SELECT
+            'Check for Fulfillment data for which cost wasn''t found by the ETL' AS TEST_DESC,
+            'Warning' AS SEVERITY,
+            ( SELECT count_if(zeroifnull(length(src.F_DO_UNIT_CST_LCL )) = 0 ) 
+FROM ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_ECOMM_DO_LN_ITM_B SRC 
+LEFT OUTER JOIN DW_DWH.DWH_F_INV_ILD_B INV
+ON SRC.ITM_ID =INV.ITM_ID
+AND SRC.FULMNT_LOC_ID = INV.LOC_ID
+AND SRC.DO_CREATED_DT BETWEEN INV.EFF_START_DT and INV.EFF_END_DT )     AS INTEGRITY_CHK_VIOLATION_ROW_CNT
+    ),-- union all the individual test results together.
+    unioned_results AS (
+        
+        SELECT TEST_DESC
+        ,INTEGRITY_CHK_VIOLATION_ROW_CNT 
+        ,SEVERITY
+        FROM test_1
+        
+        
+    )
+
+    -- Format the results into the final structure for the integrity lookup table.
+    SELECT
+        'Fulfillment'                   AS SUB_AREA_NAME,
+        'DWH_F_ECOMM_DO_LN_ITM_B'              AS TABLE_NAME,
+        '2023-12-28'                   AS LOAD_DT,
+        
+        NULL AS TXN_DT,
+        
+        ur.TEST_DESC                            AS TEST_DESC,
+        ur.INTEGRITY_CHK_VIOLATION_ROW_CNT      AS INTEGRITY_CHK_VIOLATION_ROW_CNT,
+        tr.ROW_CNT                              AS ROW_CNT,
+        CASE
+            WHEN ur.INTEGRITY_CHK_VIOLATION_ROW_CNT > 0 THEN 'Fail'
+            ELSE 'Pass'
+        END                                     AS PASS_FAIL,
+        ur.SEVERITY                             AS SEVERITY,
+        CURRENT_TIMESTAMP                       AS RCD_INS_TS,
+        CURRENT_TIMESTAMP                       AS RCD_UPD_TS
+    FROM unioned_results ur, total_rows tr
+    ORDER BY
+        CASE
+            WHEN PASS_FAIL = 'Fail' THEN 1
+            ELSE 2
+        END, TEST_DESC
+
+
+        )
+/* Query executed by Robling DBT framework */;
+[0m09:22:54  SQL status: SUCCESS 1 in 17.955 seconds
+[0m09:22:54    Inserting test results from ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table into ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+[0m09:22:54  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:54  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: describe table ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+/* Query executed by Robling DBT framework */
+[0m09:22:54  SQL status: SUCCESS 11 in 0.399 seconds
+[0m09:22:54  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:54  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: INSERT INTO ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+        (SUB_AREA_NAME, TABLE_NAME, LOAD_DT, TXN_DT, TEST_DESC, INTEGRITY_CHK_VIOLATION_ROW_CNT, ROW_CNT, PASS_FAIL, SEVERITY, RCD_INS_TS, RCD_UPD_TS)
+        SELECT SUB_AREA_NAME, TABLE_NAME, LOAD_DT, TXN_DT, TEST_DESC, INTEGRITY_CHK_VIOLATION_ROW_CNT, ROW_CNT, PASS_FAIL, SEVERITY, RCD_INS_TS, RCD_UPD_TS FROM ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+/* Query executed by Robling DBT framework */;
+[0m09:22:55  SQL status: SUCCESS 1 in 0.963 seconds
+[0m09:22:55    Fetching final test results for dbt runner from ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+[0m09:22:55  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:55  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: select * from ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+/* Query executed by Robling DBT framework */
+[0m09:22:56  SQL status: SUCCESS 1 in 0.685 seconds
+[0m09:22:56  INTEGRITY_JSON_RESULT: {"business_date": "2023-12-28", "sub_area_name": "Fulfillment", "table_name": "DWH_F_ECOMM_DO_LN_ITM_B", "violations": [{"integrity_chk_violation_row_cnt": 1786287, "pass_fail": "Fail", "row_cnt": 3362140, "severity": "Warning", "test_desc": "Check for Fulfillment data for which cost wasn\u0027t found by the ETL"}]}
+[0m09:22:56  Writing runtime sql for node "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:56  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:56  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: SELECT
+                -- 1. Count the number of failures
+                COUNT(*) AS failures,
+                -- 2. Check if the failure count should trigger a warning
+                CASE
+                    WHEN COUNT(*) != 0 THEN 1
+                    ELSE 0
+                END AS should_warn,
+                -- 3. Check if the failure count should trigger an error
+                CASE
+                    WHEN COUNT(*) != 0 THEN 1
+                    ELSE 0
+                END AS should_error
+            FROM ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+            -- Filter on failure results only
+            WHERE PASS_FAIL = 'Fail'
+/* Query executed by Robling DBT framework */
+[0m09:22:56  SQL status: SUCCESS 1 in 0.462 seconds
+[0m09:22:56  Dropping temporary relation: ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+[0m09:22:56  Applying DROP to: ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table
+[0m09:22:56  Using snowflake connection "test.robling_product.check_missing_fulfillment_cost.fd9e140997"
+[0m09:22:56  On test.robling_product.check_missing_fulfillment_cost.fd9e140997: drop table if exists ROBLING_DEV_DBT_DB.DW_TMP.check_missing_fulfillment_cost_temp_test_table cascade
+/* Query executed by Robling DBT framework */
+[0m09:22:57  SQL status: SUCCESS 1 in 0.848 seconds
+[0m09:22:57  1 of 2 WARN 1 check_missing_fulfillment_cost ................................... [[33mWARN 1[0m in 30.33s]
+[0m09:22:57  Finished running node test.robling_product.check_missing_fulfillment_cost.fd9e140997
+[0m09:22:57  Began running node test.robling_product.general_data_integrity_checks.c114d64602
+[0m09:22:57  2 of 2 START test general_data_integrity_checks ................................ [RUN]
+[0m09:22:57  Re-using an available connection from the pool (formerly test.robling_product.check_missing_fulfillment_cost.fd9e140997, now test.robling_product.general_data_integrity_checks.c114d64602)
+[0m09:22:57  Began compiling node test.robling_product.general_data_integrity_checks.c114d64602
+[0m09:22:57  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:22:57  On test.robling_product.general_data_integrity_checks.c114d64602: -- Purpose: Retrieve the current business date from the DWH_C_PARAM table
+        SELECT TO_DATE(PARAM_VALUE) AS CURR_DAY
+        FROM DW_DWH_V.V_DWH_C_PARAM
+        WHERE PARAM_NAME = 'CURR_DAY'
+/* Query executed by Robling DBT framework */
+[0m09:22:57  SQL status: SUCCESS 1 in 0.378 seconds
+[0m09:22:57  table name to test Mapping: DWH_F_ECOMM_DO_LN_ITM_B
+[0m09:22:57  Severity Mapping: {'PK violations': 'Critical', 'FK violations': 'Critical', 'Single-snapshot violations': 'Warning', 'Key Field': 'Warning', 'Optional Field': 'Informational'}
+[0m09:22:57  Writing injected SQL for node "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:22:57  Began executing node test.robling_product.general_data_integrity_checks.c114d64602
+[0m09:22:57  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:22:57  On test.robling_product.general_data_integrity_checks.c114d64602: -- Purpose: Retrieve the current business date from the DWH_C_PARAM table
+        SELECT TO_DATE(PARAM_VALUE) AS CURR_DAY
+        FROM DW_DWH_V.V_DWH_C_PARAM
+        WHERE PARAM_NAME = 'CURR_DAY'
+/* Query executed by Robling DBT framework */
+[0m09:22:58  SQL status: SUCCESS 1 in 0.595 seconds
+[0m09:22:58    Deleting existing records from ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK for current run...
+[0m09:22:58  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:22:58  On test.robling_product.general_data_integrity_checks.c114d64602: DELETE FROM ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+        WHERE LOAD_DT = '2023-12-28'
+            AND SUB_AREA_NAME = 'Fulfillment'
+            AND TABLE_NAME = 'DWH_F_ECOMM_DO_LN_ITM_B'
+            
+/* Query executed by Robling DBT framework */;
+[0m09:22:59  SQL status: SUCCESS 23 in 0.604 seconds
+[0m09:22:59    Delete statement executed.
+[0m09:22:59  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:22:59  On test.robling_product.general_data_integrity_checks.c114d64602: create or replace temporary table ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+         as
+        (
+    
+    
+    
+    WITH checks AS (
+        SELECT
+            0 AS "dummy",
+            COUNT(*) :: INT AS "Total Records"
+
+            
+            
+            , (COUNT(*) - COUNT(DISTINCT src.DO_LN_ID)) :: INT AS "PK violations"
+            
+
+            
+            
+            , COUNT_IF(DWH_F_ECOMM_DO_HDR_B.DO_ID IS NULL) :: INT AS "FK violations on Column DO_ID"
+            
+            , COUNT_IF(DWH_F_ECOMM_CO_HDR_B.CO_ID IS NULL) :: INT AS "FK violations on Column CO_ID"
+            
+            , COUNT_IF(DWH_F_ECOMM_CO_LN_ITM_B.CO_LN_ID IS NULL) :: INT AS "FK violations on Column CO_LN_ID"
+            
+            , COUNT_IF(DWH_D_PRD_ITM_LU.ITM_ID IS NULL) :: INT AS "FK violations on Column ITM_ID"
+            
+
+            
+            
+
+            
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.DO_LN_NUM)) = 0) :: INT AS "DO_LN_NUM not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.DO_LN_STTS)) = 0) :: INT AS "DO_LN_STTS not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.DO_CREATED_DT)) = 0) :: INT AS "DO_CREATED_DT not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.DO_CREATED_MIN_KEY)) = 0) :: INT AS "DO_CREATED_MIN_KEY not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_CURR_QTY)) = 0) :: INT AS "F_DO_CURR_QTY not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_FULFILL_QTY)) = 0) :: INT AS "F_FULFILL_QTY not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_UNIT_CST)) = 0) :: INT AS "F_DO_UNIT_CST not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_UNIT_CST_LCL)) = 0) :: INT AS "F_DO_UNIT_CST_LCL not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.LCL_CNCY_CDE)) = 0) :: INT AS "LCL_CNCY_CDE not populated (Key Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.IS_DELETED)) = 0) :: INT AS "IS_DELETED not populated (Key Field)"
+            
+
+            
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_ORIG_QTY)) = 0) :: INT AS "F_DO_ORIG_QTY not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_CANCLD_QTY)) = 0) :: INT AS "F_DO_CANCLD_QTY not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_TAX_AMT)) = 0) :: INT AS "F_DO_TAX_AMT not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_TAX_AMT_LCL)) = 0) :: INT AS "F_DO_TAX_AMT_LCL not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_LN_ORD_TOT_AMT)) = 0) :: INT AS "F_DO_LN_ORD_TOT_AMT not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.F_DO_LN_ORD_TOT_AMT_LCL)) = 0) :: INT AS "F_DO_LN_ORD_TOT_AMT_LCL not populated (Optional Field)"
+            
+            , COUNT_IF(ZEROIFNULL(LENGTH(src.SRC_UPD_TS)) = 0) :: INT AS "SRC_UPD_TS not populated (Optional Field)"
+            
+
+        FROM ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_ECOMM_DO_LN_ITM_B src
+
+        
+        
+        LEFT JOIN DWH_F_ECOMM_DO_HDR_B DWH_F_ECOMM_DO_HDR_B ON src.DO_ID = TRIM(DWH_F_ECOMM_DO_HDR_B.DO_ID)
+        
+        LEFT JOIN DWH_F_ECOMM_CO_HDR_B DWH_F_ECOMM_CO_HDR_B ON src.CO_ID = TRIM(DWH_F_ECOMM_CO_HDR_B.CO_ID)
+        
+        LEFT JOIN DWH_F_ECOMM_CO_LN_ITM_B DWH_F_ECOMM_CO_LN_ITM_B ON src.CO_LN_ID = TRIM(DWH_F_ECOMM_CO_LN_ITM_B.CO_LN_ID)
+        
+        LEFT JOIN DWH_D_PRD_ITM_LU DWH_D_PRD_ITM_LU ON src.ITM_ID = TRIM(DWH_D_PRD_ITM_LU.ITM_ID)
+        
+
+        )
+    ,
+    
+    unpiv AS (
+        SELECT * FROM checks
+        UNPIVOT ("# Records" FOR "Test Condition" IN (
+            "Total Records"
+            
+            , "PK violations"
+            
+            
+            , "FK violations on Column DO_ID"
+            
+            , "FK violations on Column CO_ID"
+            
+            , "FK violations on Column CO_LN_ID"
+            
+            , "FK violations on Column ITM_ID"
+            
+            
+            
+            , "DO_LN_NUM not populated (Key Field)"
+            
+            , "DO_LN_STTS not populated (Key Field)"
+            
+            , "DO_CREATED_DT not populated (Key Field)"
+            
+            , "DO_CREATED_MIN_KEY not populated (Key Field)"
+            
+            , "F_DO_CURR_QTY not populated (Key Field)"
+            
+            , "F_FULFILL_QTY not populated (Key Field)"
+            
+            , "F_DO_UNIT_CST not populated (Key Field)"
+            
+            , "F_DO_UNIT_CST_LCL not populated (Key Field)"
+            
+            , "LCL_CNCY_CDE not populated (Key Field)"
+            
+            , "IS_DELETED not populated (Key Field)"
+            
+            
+            , "F_DO_ORIG_QTY not populated (Optional Field)"
+            
+            , "F_DO_CANCLD_QTY not populated (Optional Field)"
+            
+            , "F_DO_TAX_AMT not populated (Optional Field)"
+            
+            , "F_DO_TAX_AMT_LCL not populated (Optional Field)"
+            
+            , "F_DO_LN_ORD_TOT_AMT not populated (Optional Field)"
+            
+            , "F_DO_LN_ORD_TOT_AMT_LCL not populated (Optional Field)"
+            
+            , "SRC_UPD_TS not populated (Optional Field)"
+            
+        ))
+    )
+    
+    SELECT
+        'Fulfillment'                   AS SUB_AREA_NAME,
+        'DWH_F_ECOMM_DO_LN_ITM_B'              AS TABLE_NAME,
+        '2023-12-28'                   AS LOAD_DT,
+        
+        NULL AS TXN_DT,
+        
+        "Test Condition"                        AS TEST_DESC,
+        CASE WHEN "Test Condition" = 'Total Records' THEN ''
+            ELSE
+                "# Records"::VARCHAR 
+        END                                     AS INTEGRITY_CHK_VIOLATION_ROW_CNT,
+        CASE WHEN "Test Condition" = 'Total Records' THEN "# Records" :: INT
+            ELSE MAX("# Records" :: INT) OVER ()
+        END                                     AS ROW_CNT,
+        CASE
+            WHEN "Test Condition" = 'Total Records' THEN ''
+            WHEN "# Records" > 0 THEN 'Fail'
+            ELSE 'Pass'
+        END                                     AS PASS_FAIL,
+        -- severity logic
+        CASE 
+            WHEN "Test Condition" LIKE '%PK violations%' THEN 'Critical'
+            WHEN "Test Condition" LIKE '%FK violations%' THEN 'Critical'
+            WHEN "Test Condition" LIKE '%Single-snapshot%' THEN 'Warning'
+            WHEN "Test Condition" LIKE '%(Key Field)%' THEN 'Warning'
+            WHEN "Test Condition" LIKE '%(Optional Field)%' THEN 'Informational'
+            ELSE 'Informational'
+        END                                     AS SEVERITY,
+        CURRENT_TIMESTAMP                       AS RCD_INS_TS,
+        CURRENT_TIMESTAMP                       AS RCD_UPD_TS
+    FROM unpiv
+    
+    --Replacing WHERE with QUALIFY since where first filters the rows with 'Total Records' value first
+    --and calculates the ROW_CNT
+    QUALIFY "Test Condition" <> 'Total Records'
+    ORDER BY
+        CASE
+            WHEN PASS_FAIL = 'Fail' THEN 1
+            ELSE 2
+        END, 
+        CASE SEVERITY
+            WHEN 'Critical' THEN 1
+            WHEN 'Warning' THEN 2
+            WHEN 'Informational' THEN 3
+            ELSE 4
+        END,
+        TEST_DESC
+    
+        )
+/* Query executed by Robling DBT framework */;
+[0m09:23:06  SQL status: SUCCESS 1 in 7.140 seconds
+[0m09:23:06    Inserting test results from ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table into ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+[0m09:23:06  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:06  On test.robling_product.general_data_integrity_checks.c114d64602: describe table ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+/* Query executed by Robling DBT framework */
+[0m09:23:06  SQL status: SUCCESS 11 in 0.363 seconds
+[0m09:23:06  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:06  On test.robling_product.general_data_integrity_checks.c114d64602: INSERT INTO ROBLING_DEV_DBT_DB.DW_DWH.DWH_F_INTEGRITY_CHK
+        (SUB_AREA_NAME, TABLE_NAME, LOAD_DT, TXN_DT, TEST_DESC, INTEGRITY_CHK_VIOLATION_ROW_CNT, ROW_CNT, PASS_FAIL, SEVERITY, RCD_INS_TS, RCD_UPD_TS)
+        SELECT SUB_AREA_NAME, TABLE_NAME, LOAD_DT, TXN_DT, TEST_DESC, INTEGRITY_CHK_VIOLATION_ROW_CNT, ROW_CNT, PASS_FAIL, SEVERITY, RCD_INS_TS, RCD_UPD_TS FROM ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+/* Query executed by Robling DBT framework */;
+[0m09:23:07  SQL status: SUCCESS 22 in 0.713 seconds
+[0m09:23:07    Fetching final test results for dbt runner from ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+[0m09:23:07  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:07  On test.robling_product.general_data_integrity_checks.c114d64602: select * from ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+/* Query executed by Robling DBT framework */
+[0m09:23:07  SQL status: SUCCESS 22 in 0.448 seconds
+[0m09:23:07  INTEGRITY_JSON_RESULT: {"business_date": "2023-12-28", "sub_area_name": "Fulfillment", "table_name": "DWH_F_ECOMM_DO_LN_ITM_B", "violations": [{"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_TAX_AMT_LCL not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "SRC_UPD_TS not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "1786287", "pass_fail": "Fail", "row_cnt": 3362140, "severity": "Warning", "test_desc": "F_DO_UNIT_CST not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "1786287", "pass_fail": "Fail", "row_cnt": 3362140, "severity": "Warning", "test_desc": "F_DO_UNIT_CST_LCL not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_LN_ORD_TOT_AMT_LCL not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_ORIG_QTY not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_TAX_AMT not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "F_DO_CURR_QTY not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "IS_DELETED not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "LCL_CNCY_CDE not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_LN_ORD_TOT_AMT not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "DO_LN_NUM not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "DO_LN_STTS not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Critical", "test_desc": "PK violations"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "DO_CREATED_DT not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Warning", "test_desc": "DO_CREATED_MIN_KEY not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "56852", "pass_fail": "Fail", "row_cnt": 3362140, "severity": "Warning", "test_desc": "F_FULFILL_QTY not populated (Key Field)"}, {"integrity_chk_violation_row_cnt": "3334383", "pass_fail": "Fail", "row_cnt": 3362140, "severity": "Informational", "test_desc": "F_DO_CANCLD_QTY not populated (Optional Field)"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Critical", "test_desc": "FK violations on Column CO_ID"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Critical", "test_desc": "FK violations on Column CO_LN_ID"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Critical", "test_desc": "FK violations on Column DO_ID"}, {"integrity_chk_violation_row_cnt": "0", "pass_fail": "Pass", "row_cnt": 3362140, "severity": "Critical", "test_desc": "FK violations on Column ITM_ID"}]}
+[0m09:23:07  Writing runtime sql for node "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:07  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:07  On test.robling_product.general_data_integrity_checks.c114d64602: SELECT
+                -- 1. Count the number of failures
+                COUNT(*) AS failures,
+                -- 2. Check if the failure count should trigger a warning
+                CASE
+                    WHEN COUNT(*) != 0 THEN 1
+                    ELSE 0
+                END AS should_warn,
+                -- 3. Check if the failure count should trigger an error
+                CASE
+                    WHEN COUNT(*) != 0 THEN 1
+                    ELSE 0
+                END AS should_error
+            FROM ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+            -- Filter on failure results only
+            WHERE PASS_FAIL = 'Fail'
+/* Query executed by Robling DBT framework */
+[0m09:23:08  SQL status: SUCCESS 1 in 0.412 seconds
+[0m09:23:08  Dropping temporary relation: ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+[0m09:23:08  Applying DROP to: ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table
+[0m09:23:08  Using snowflake connection "test.robling_product.general_data_integrity_checks.c114d64602"
+[0m09:23:08  On test.robling_product.general_data_integrity_checks.c114d64602: drop table if exists ROBLING_DEV_DBT_DB.DW_TMP.general_data_integrity_checks_temp_test_table cascade
+/* Query executed by Robling DBT framework */
+[0m09:23:08  SQL status: SUCCESS 1 in 0.435 seconds
+[0m09:23:08  2 of 2 WARN 4 general_data_integrity_checks .................................... [[33mWARN 4[0m in 11.21s]
+[0m09:23:08  Finished running node test.robling_product.general_data_integrity_checks.c114d64602
+[0m09:23:08  
+[0m09:23:08  Writing injected SQL for node "operation.robling_product.robling_product-on-run-end-0"
+[0m09:23:08  1 of 1 START hook: robling_product.on-run-end.0 ................................ [RUN]
+[0m09:23:08  1 of 1 OK hook: robling_product.on-run-end.0 ................................... [[32mOK[0m in 0.02s]
+[0m09:23:08  Connection 'master' was properly closed.
+[0m09:23:08  Connection 'list_ROBLING_DEV_DBT_DB_DW_CFG' was left open.
+[0m09:23:08  On list_ROBLING_DEV_DBT_DB_DW_CFG: Close
+[0m09:23:09  Connection 'test.robling_product.general_data_integrity_checks.c114d64602' was left open.
+[0m09:23:09  On test.robling_product.general_data_integrity_checks.c114d64602: Close
+[0m09:23:10  
+[0m09:23:10  Finished running 1 project hook, 2 data tests in 0 hours 1 minutes and 0.89 seconds (60.89s).
+[0m09:23:10  Command end result
+[0m09:23:10  Wrote artifact WritableManifest to C:\Drive_D\Robling\roblingdbt\target\manifest.json
+[0m09:23:10  Wrote artifact SemanticManifest to C:\Drive_D\Robling\roblingdbt\target\semantic_manifest.json
+[0m09:23:10  Wrote artifact RunExecutionResult to C:\Drive_D\Robling\roblingdbt\target\run_results.json
+[0m09:23:10  
+[0m09:23:10  [33mCompleted with 2 warnings:[0m
+[0m09:23:10  
+[0m09:23:10  [33mWarning in test check_missing_fulfillment_cost (models\Robling core\Omnichannel\Fulfillment\Distribution orders (DOs)\dwh\DWH_F_ECOMM_DO_LN_ITM_B.yml)[0m
+[0m09:23:10  Got 1 result, configured to warn if != 0
+[0m09:23:10  
+[0m09:23:10    compiled code at target\compiled\robling_product\models\Robling core\Omnichannel\Fulfillment\Distribution orders (DOs)\dwh\DWH_F_ECOMM_DO_LN_ITM_B.yml\check_missing_fulfillment_cost.sql
+[0m09:23:10  
+[0m09:23:10  [33mWarning in test general_data_integrity_checks (models\Robling core\Omnichannel\Fulfillment\Distribution orders (DOs)\dwh\DWH_F_ECOMM_DO_LN_ITM_B.yml)[0m
+[0m09:23:10  Got 4 results, configured to warn if != 0
+[0m09:23:10  
+[0m09:23:10    compiled code at target\compiled\robling_product\models\Robling core\Omnichannel\Fulfillment\Distribution orders (DOs)\dwh\DWH_F_ECOMM_DO_LN_ITM_B.yml\general_data_integrity_checks.sql
+[0m09:23:10  
+[0m09:23:10  Done. PASS=1 WARN=2 ERROR=0 SKIP=0 NO-OP=0 TOTAL=3
+[0m09:23:10  [[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MissingArgumentsPropertyInGenericTestDeprecation: 17 occurrences
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.
+[0m09:23:10  Command `dbt test` succeeded at 15:08:10.518606 after 72.65 seconds
+[0m09:23:10  Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F849D8B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002099A46C5E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000209F976C550>]}
+[0m09:23:10  Flushing usage events
+[0m09:23:12  An error was encountered while trying to flush usage events

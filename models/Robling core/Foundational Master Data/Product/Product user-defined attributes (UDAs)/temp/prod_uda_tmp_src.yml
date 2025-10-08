@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: PROD_UDA_TMP_SRC
+    schema: DW_STG_V
+    tables:
+      - name: V_STG_D_PRD_UDA_LU
+      - name: V_STG_D_PRD_UDA_ITM_MTX

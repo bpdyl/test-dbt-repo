@@ -1,0 +1,42 @@
+{% set key_columns = ['ATTR_VARCHAR_COL14', 'FACT_CDE'] %}
+{% set hash_columns = [
+'POST_DT', 'MEAS_DT', 'ORD_DOC_CREATED_DT', 'ORD_DOC_DUE_DT', 'INV_DOC_CREATED_DT',
+'INV_DOC_DUE_DT', 'SHIPPED_DT', 'RCPT_DT', 'CLOSED_DT', 'CANCLD_DT', 'RTRN_DT',
+'MIN_KEY', 'CHN_KEY', 'CHN_ID', 'CHNL_KEY', 'CHNL_ID', 'LOC_KEY', 'LOC_ID', 'DMND_LOC_KEY',
+'DMND_LOC_ID', 'FULFILL_LOC_KEY', 'FULFILL_LOC_ID', 'INV_FROM_LOC_KEY', 'INV_FROM_LOC_ID',
+'INV_TO_LOC_KEY', 'INV_TO_LOC_ID', 'LOC_TYP_CDE', 'POSTAL_CDE', 'STATE_PROVINCE_CDE', 'COUNTRY_CDE',
+'DIV_KEY', 'DIV_ID', 'ITM_KEY', 'ITM_ID', 'PACK_ITM_KEY', 'PACK_ITM_ID', 'SUP_KEY', 'SUP_ID',
+'EMP_KEY', 'EMP_ID', 'CUS_PROFILE_KEY', 'CUS_PROFILE_ID', 'PRM_KEY', 'PRM_ID', 'ITMLOC_STTS_CDE', 'RTL_TYP_CDE',
+'RTRN_FLG', 'RSN_ID', 'CO_ID', 'DO_ID', 'VERSION_ID', 'TXN_ID', 'PO_ID', 'ASN_ID',
+'STTS_CDE', 'ORD_DOC_LN_STTS_CDE', 'INV_DOC_LN_STTS_CDE', 'LCL_CNCY_CDE', 'F_FACT_QTY',
+'F_FACT_CST', 'F_FACT_RTL', 'F_FACT_QTY1', 'F_FACT_QTY2', 'F_FACT_QTY3', 'F_FACT_QTY4',
+'F_FACT_QTY5', 'F_FACT_QTY6', 'F_FACT_QTY7', 'F_FACT_QTY8', 'F_FACT_QTY9', 'F_FACT_QTY10', 'F_FACT_AMT1',
+'F_FACT_AMT2', 'F_FACT_AMT3', 'F_FACT_AMT4', 'F_FACT_AMT5', 'F_FACT_AMT6', 'F_FACT_AMT7',
+'F_FACT_AMT8', 'F_FACT_AMT9', 'F_FACT_AMT10', 'ATTR_DT_COL1', 'ATTR_DT_COL2', 'ATTR_DT_COL3',
+'ATTR_DT_COL4', 'ATTR_DT_COL5', 'ATTR_DT_COL6', 'ATTR_DT_COL7', 'ATTR_DT_COL8', 'ATTR_DT_COL9', 'ATTR_DT_COL10',
+'ATTR_NUM_COL1', 'ATTR_NUM_COL2', 'ATTR_NUM_COL3', 'ATTR_NUM_COL4', 'ATTR_NUM_COL5', 'ATTR_NUM_COL6',
+'ATTR_NUM_COL7', 'ATTR_NUM_COL8', 'ATTR_NUM_COL9', 'ATTR_NUM_COL10', 'ATTR_VARCHAR_COL1', 'ATTR_VARCHAR_COL2',
+'ATTR_VARCHAR_COL3', 'ATTR_VARCHAR_COL4', 'ATTR_VARCHAR_COL5', 'ATTR_VARCHAR_COL6', 'ATTR_VARCHAR_COL7',
+'ATTR_VARCHAR_COL8', 'ATTR_VARCHAR_COL9', 'ATTR_VARCHAR_COL10', 'ATTR_VARCHAR_COL11', 'ATTR_VARCHAR_COL12',
+'ATTR_VARCHAR_COL13', 'ATTR_VARCHAR_COL15', 'ATTR_VARCHAR_COL16', 'ATTR_VARCHAR_COL17', 'ATTR_VARCHAR_COL18',
+'ATTR_VARCHAR_COL19', 'ATTR_VARCHAR_COL20', 'ATTR_VARCHAR_COL21', 'ATTR_VARCHAR_COL22', 'ATTR_VARCHAR_COL23',
+'ATTR_VARCHAR_COL24', 'ATTR_VARCHAR_COL25', 'ATTR_VARCHAR_COL26', 'ATTR_VARCHAR_COL28', 'ATTR_VARCHAR_COL29',
+'ATTR_VARCHAR_COL27', 'ATTR_VARCHAR_COL30'
+] %}
+{{
+    config(
+        materialized='custom_merge',
+        unique_key=key_columns,
+        key_columns=key_columns,
+        hash_columns=hash_columns,
+        insert_columns=key_columns + hash_columns,
+        schema='DM_MERCH',
+        target_table = 'DM_F_MEAS_FACT_ILD_B',
+        tags = ['dm_f_inv_txn_meas_fact_ild'],
+        pre_hook=["{{ start_script('dm_f_inv_txn_meas_fact_ild','RUNNING','NONE') }}"],
+        post_hook = ["{{ load_recon_data('Inventory Transactions',recon_config_macro='mac_f_inv_txn_recon_script_sql', recon_step=2) }}"
+                    ,"{{ log_script_success(this) }}"]
+    )
+}}
+SELECT *
+FROM {{ ref("V_CFG_F_INV_TXN_ILD_B") }}

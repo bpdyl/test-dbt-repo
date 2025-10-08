@@ -1,0 +1,26 @@
+{{ config(
+    materialized='incremental',
+    transient=false,
+    alias='DWH_D_ORG_ARA_LU',
+    schema='DW_DWH',
+    unique_key=['ARA_ID'],
+    merge_exclude_columns=['ARA_ID','ARA_KEY','RCD_INS_TS'],
+    rollup_fields = ['CHN_ID', 'CHN_NUM', 'CHN_DESC'],
+    rollup_key = ['CHN_KEY'],
+    on_schema_change='append_new_columns',
+    tags=['d_org_ara_ld'],
+    post_hook = ["{{ log_dml_audit(this,ref('TMP_D_ORG_ARA_LU'),'MERGE') }}"
+                ,"{{ close_dimension_using_temp(this, ref('TMP_D_ORG_ARA_LU'), 'ARA_KEY') }}"
+                ,"{{ update_closed_dimension_using_rollup(this, ref('DWH_D_ORG_CHN_LU')) }}"
+                ,"{{ log_script_success(this) }}"
+    ]
+) }}
+
+SELECT 
+    *  
+    ,{{ dbt_utils.generate_surrogate_key(config.get('unique_key')) }} AS ARA_KEY
+    ,CURRENT_TIMESTAMP::TIMESTAMP_NTZ                                 AS RCD_INS_TS
+    ,CURRENT_TIMESTAMP::TIMESTAMP_NTZ                                 AS RCD_UPD_TS
+    ,0                                                                AS RCD_CLOSE_FLG
+    ,TO_DATE('9999-12-31')                                            AS RCD_CLOSE_DT
+FROM {{ ref('TMP_D_ORG_ARA_LU') }} 

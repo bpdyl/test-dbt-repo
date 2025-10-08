@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_UDA_ITM_MTX
+    description: "Staging view for Product User Defined Attributes Item Matrix Table"
+    columns:
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item for which UDA is attributed to. The Robling ETL will join on this column."
+      - name: UDA_ID
+        description: "Unique identifier in the source system for the User Defined Attribute (UDA). The Robling ETL will join on this column."
+      - name: UDA_VALUE
+        description: "UDA which are attributed to items."
+      - name: UDA_VALUE_DESC
+        description: "Description for the value of the User Defined Attribute (UDA)."
+      - name: UDA_DESC
+        description: "Description for the User Defined Attribute (UDA)."
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [ITM_ID,UDA_ID,UDA_VALUE]
+

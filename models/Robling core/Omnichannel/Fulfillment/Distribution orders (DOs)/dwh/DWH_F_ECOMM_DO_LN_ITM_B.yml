@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: DWH_F_ECOMM_DO_LN_ITM_B
+    tags: ["f_ecomm_do_ln_itm_ld"]
+    description: "Fact table for fulfillment detail."
+    data_tests:
+      - robling_product.run_general_integrity_checks: ## Actual name of the test.
+          name: general_data_integrity_checks # Human friendly name for the test.
+          primary_key_columns: ["DO_LN_ID"]
+          foreign_key_checks:
+            - column_name: "DO_ID"
+              parent_table: "DWH_F_ECOMM_DO_HDR_B"
+              parent_pk_column: "DO_ID"
+            - column_name: "CO_ID"
+              parent_table: "DWH_F_ECOMM_CO_HDR_B"
+              parent_pk_column: "CO_ID"
+            - column_name: "CO_LN_ID"
+              parent_table: "DWH_F_ECOMM_CO_LN_ITM_B"
+              parent_pk_column: "CO_LN_ID"
+            - column_name: "ITM_ID"
+              parent_table: "DWH_D_PRD_ITM_LU"
+              parent_pk_column: "ITM_ID"
+          key_fields:
+            - DO_LN_NUM
+            - DO_LN_STTS
+            - DO_CREATED_DT
+            - DO_CREATED_MIN_KEY
+            - F_DO_CURR_QTY
+            - F_FULFILL_QTY
+            - F_DO_UNIT_CST
+            - F_DO_UNIT_CST_LCL
+            - LCL_CNCY_CDE
+            - IS_DELETED
+          optional_fields:
+            - F_DO_ORIG_QTY
+            - F_DO_CANCLD_QTY
+            - F_DO_TAX_AMT
+            - F_DO_TAX_AMT_LCL
+            - F_DO_LN_ORD_TOT_AMT
+            - F_DO_LN_ORD_TOT_AMT_LCL
+            - SRC_UPD_TS
+          config:
+            custom_test: true
+            sub_area_name: "Fulfillment" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+            table_name_to_test: "DWH_F_ECOMM_DO_LN_ITM_B"
+            # Override default severity mapping
+            custom_severity_mapping: 
+              PK violations: "Critical"
+              FK violations: "Critical"
+              Single-snapshot violations: "Warning"
+              Key Field: "Warning"
+              Optional Field: "Informational"
+
+      - robling_product.run_custom_sql_checks: ## Actual name of the test.
+          name: "check_missing_fulfillment_cost" # Human friendly name for the test.
+          custom_sql_tests:
+            - name: "Check for Fulfillment data for which cost wasn''t found by the ETL"
+              custom_severity: "Warning"  # severity field per test
+              sql: |
+                SELECT count_if(zeroifnull(length(src.F_DO_UNIT_CST_LCL )) = 0 ) 
+                FROM {{ ref('DWH_F_ECOMM_DO_LN_ITM_B') }} SRC 
+                LEFT OUTER JOIN DW_DWH.DWH_F_INV_ILD_B INV
+                ON SRC.ITM_ID =INV.ITM_ID
+                AND SRC.FULMNT_LOC_ID = INV.LOC_ID
+                AND SRC.DO_CREATED_DT BETWEEN INV.EFF_START_DT and INV.EFF_END_DT
+          config:
+            custom_test: true
+            sub_area_name: "Fulfillment" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+            table_name_to_test: "DWH_F_ECOMM_DO_LN_ITM_B"

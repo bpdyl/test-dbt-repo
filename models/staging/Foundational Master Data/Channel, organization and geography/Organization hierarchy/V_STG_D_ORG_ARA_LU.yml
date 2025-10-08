@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_ARA_LU
+    description: "Staging view for Organization Area Lookup Table"
+    columns:
+      - name: ARA_ID
+        description: "Unique identifier in the source system for the Area. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: ARA_NUM
+        description: "Identifier for the Area displayed to users and reports. May or may not be the same as the ID."
+      - name: ARA_DESC
+        description: "Description for the Area."
+      - name: CHN_ID
+        description: "Unique identifier in the source system for the Chain. The Robling ETL will join on this column."
+      - name: ARA_MGR_NAME
+        description: "Area Manager." 

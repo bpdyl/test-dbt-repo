@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_STY_IMG_LU
+    description: "Staging view for Product Style image Lookup Table"
+    columns: 
+      - name: STY_ID
+        description: "Unique identifier in the source system for the Style. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: IMG_TYPE
+        description: "The type of image, such as 'main', 'scale', 'detail', etc."
+      - name: IMG_NAME
+        description: "The URL or URL substring for the image."
+      - name: IMG_EXT
+        description: "The extension of the image, such as JPEG, GIF, etc."

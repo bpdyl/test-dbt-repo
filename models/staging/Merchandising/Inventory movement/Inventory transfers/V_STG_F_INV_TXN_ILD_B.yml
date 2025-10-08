@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: V_STG_F_INV_TXN_ILD_B
+    description: "Staging view for Daily Inventory Snapshots."
+    columns:
+      - name: ROW_ID
+        description: "Unique identifier in the source system for the this row. The Robling ETL will join on this column."
+      - name: POST_DT
+        description: "Date when the inventory transacction was posted to the source system (usually Merch). Sometimes known as Business Date."
+      - name: TXN_DT
+        description: "Date when the inventory transaction took place."
+      - name: TXN_TS
+        description: "Timestamp when the inventory transaction took place."
+      - name: LOC_ID
+        description: "Unique identifier in the source system for the location affected by the inventory transaction. The Robling ETL will join on this column."
+      - name: LOC_2_ID
+        description: "Unique identifier in the source system for the secondary location, such as a from-location or a to-location. The Robling ETL will join on this column."
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item. The Robling ETL will join on this column."
+      - name: SUP_ID
+        description: "Unique identifier in the source system for the Supplier against which the PO was issued. The Robling ETL will join on this column."
+      - name: INV_TXN_TYP
+        description: "Transaction type code, such as 200 for receipt."
+      - name: INV_TXN_DOC_ID
+        description: "Unique identifier in the source system for the document associated with the transaction, such as a PO # for a receipt transaction."
+      - name: ITMLOC_STTS_CDE
+        description: "Retail price status code for this item at this location, such as 'R' for Regular and 'C' for Clearance"
+      - name: F_INV_TXN_QTY
+        description: "Quantity (in units) of inventory affected by the transaction."
+      - name: F_INV_TXN_CST_LCL
+        description: "Cost valuation of inventory affected by the transaction, usually based on Weighted Average Cost (WAC), in local currency."
+      - name: F_INV_TXN_RTL_LCL
+        description: "Retail valuation of inventory affected by the transaction, in local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code"
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [ROW_ID]

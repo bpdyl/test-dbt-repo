@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: V_STG_F_ECOMM_DO_LN_ITM_B
+    description: "Staging view for eCommerce Customer Fulfillment Line Item"
+    columns:
+      - name: DO_ID
+        description: "Unique identifier in the source system for the ecomm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
+        tests:
+          - not_null
+      - name: DO_LN_ID
+        description: "Unique identifier in the source system for the line item within the ecomm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
+        tests:
+          - not_null
+      - name: DO_LN_NUM
+        description: "Identifier for the line item within the ecomm Distribution Order (AKA fulfillment) displayed to users and reports. May or may not be the same as the ID."
+      - name: CO_ID
+        description: "Unique identifier in the source system for the ecomm Customer Order. The Robling ETL will join on this column."
+      - name: CO_LN_ID
+        description: "Unique identifier in the source system for the ecomm Customer Order Line. The Robling ETL will join on this column."
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the item fulfilled. The Robling ETL will join on this column."
+      - name: DO_LN_STTS
+        description: "Code or Description of the Distribution Order line item status, such as picked, packed, shipped etc.."
+      - name: F_DO_ORIG_QTY
+        description: "Quantity (in units) of product originally requested in the distribution order (AKA fulfillment)."
+      - name: F_DO_CURR_QTY
+        description: "Quantity (in units) of product currently in the line item of a distribution order (AKA fulfillment)."
+      - name: F_DO_CANCLD_QTY
+        description: "Quantity (in units) of product cancelled from the distribution order, usually by the fulfilling location."
+      - name: F_FULFILL_QTY
+        description: "Quantity (in units) of product fulfilled."
+      - name: F_DO_TAX_AMT_LCL
+        description: "Tax amount corresponding to the current quantity in the distribution order (also known as fulfillment), in local currency."
+      - name: F_DO_LN_ORD_TOT_AMT_LCL
+        description: "Total amount in an order for customer line, including all charges such as S&H, in local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code."
+      - name: SRC_UPD_TS
+        description: "Timestamp when this record was last modified at the source system."
+      - name: IS_DELETED
+        description: "Indicates whether this record is marked as deleted at the source."
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [DO_LN_ID]

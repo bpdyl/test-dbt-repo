@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_UDA_LU
+    description: "Staging view for Product User Defined Attributes Lookup Table"
+    columns:
+      - name: UDA_ID
+        description: "Unique identifier in the source system for the User Defined Attribute (UDA). The Robling ETL will join on this column."
+      - name: UDA_DESC
+        description: "Description for the User Defined Attribute (UDA)."
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [UDA_ID]

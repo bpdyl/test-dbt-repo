@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: V_STG_D_SUP_LU
+    description: "Staging view for Supplier Lookup Table"
+    columns:
+      - name: SUP_ID
+        description: "Unique identifier in the source system for the Supplier. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: SUP_NUM
+        description: "Identifier for the Supplier displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: SUP_DESC
+        description: "Description for the Supplier."
+      - name: SUP_CNCY_CDE
+        description: "Currency code that supplier uses/works under"
+      - name: SUP_PARENT_ID
+        description: "The unique identifier of supplier parent"

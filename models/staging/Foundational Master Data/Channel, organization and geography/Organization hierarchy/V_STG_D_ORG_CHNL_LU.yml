@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_CHNL_LU
+    description: "Staging view for Organization Channel Lookup Table"
+    columns:
+      - name: CHNL_ID
+        description: "Unique identifier in the source system for the Channel, such as eComm or B&M. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: CHNL_NUM
+        description: "Identifier for the Channel, such as eComm or B&M displayed to users and reports. May or may not be the same as the ID."
+      - name: CHNL_DESC
+        description: "Description for the Channel, such as eComm or B&M."

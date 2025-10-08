@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_CHN_LU
+    description: "Staging view for Organization Chain Lookup Table"
+    columns:
+      - name: CHN_ID
+        description: "Unique identifier in the source system for the Chain, such as Gap or Old Navy for Gap Inc. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: CHN_NUM
+        description: "Identifier for the Chain displayed to users and reports. May or may not be the same as the ID."
+      - name: CHN_DESC
+        description: "Description for the Chain."
+      - name: CHN_MGR_NAME
+        description: "Chain Manager."

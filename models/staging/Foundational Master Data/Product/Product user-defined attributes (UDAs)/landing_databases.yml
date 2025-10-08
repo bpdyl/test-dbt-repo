@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: PRD_UDA_STG_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_D_PRD_UDA_LU
+      - name: LND_D_PRD_UDA_ITM_MTX
+
+  - name: PRD_UDA_STG_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_D_PRD_UDA_LU
+      - name: LND_D_PRD_UDA_ITM_MTX
+

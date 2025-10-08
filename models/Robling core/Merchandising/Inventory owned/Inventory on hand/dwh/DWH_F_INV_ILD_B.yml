@@ -1,0 +1,74 @@
+version: 2
+
+models:
+  - name: DWH_F_INV_ILD_B
+    tags: ['f_inv_ild_ld']
+    description: "Compressed fact table that holds inventory position at the item/location/day level."
+    data_tests:
+        - robling_product.run_general_integrity_checks: ## Actual name of the test.
+            name: general_data_integrity_checks # Human friendly name for the test.
+            primary_key_columns: ["LOC_ID", "ITM_ID","EFF_START_DT"]
+            foreign_key_checks:
+                - column_name: "LOC_ID"
+                  parent_table: "DWH_D_ORG_LOC_LU"
+                  parent_pk_column: "LOC_ID"
+                - column_name: "ITM_ID"
+                  parent_table: "DWH_D_PRD_ITM_LU"
+                  parent_pk_column: "ITM_ID"
+            #snapshot_column: "EFF_START_DT"
+            key_fields:
+                - ITMLOC_STTS_CDE
+                - F_OH_QTY
+                - F_OH_CST_LCL
+                - F_OH_RTL_LCL
+                - F_IT_RTL_LCL
+                - F_UNIT_WAC_CST_LCL
+                - F_UNIT_RTL_LCL
+                - LCL_CNCY_CDE
+            optional_fields:
+                - F_IT_QTY
+                - F_IT_CST_LCL
+                - F_REG_UNIT_RTL_LCL
+                - F_PROMO_RTL_LCL
+            config: 
+                severity: warn
+                custom_test: true
+                where_condition: |
+                    /* Filtering on one month of inventory data */
+                        EFF_START_DT BETWEEN (SELECT CURR_MTH_START_DT FROM DW_DWH.DWH_D_CURR_TIM_LU) AND
+                        (SELECT CURR_MTH_END_DT FROM DW_DWH.DWH_D_CURR_TIM_LU)
+                sub_area_name: "Inventory On-Hand" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+                table_name_to_test: "DWH_F_INV_ILD_B"
+
+        # The 'run_custom_sql_checks' macro allows for flexible definition of multiple custom SQL-based tests.
+        # You can define multiple individual test cases within a single 'name' block (as shown below for
+        # "check_oh_rtl_equals_zero_and_missing_items").
+        # Alternatively, you can create entirely separate blocks with different 'name' parameters
+        # to group related custom tests or logically separate them (as shown for "check_for_source_data_freshness_and_inv_compression").
+        # Each 'name' parameter for 'run_custom_sql_checks' effectively creates a distinct test execution block.
+        - robling_product.run_custom_sql_checks: ## Actual name of the test.
+            name: "check_oh_rtl_equals_zero_and_missing_items" # Human friendly name for the test.
+            custom_sql_tests:
+                - name: "Check for items on hand with zero retail value"
+                  sql: "SELECT COUNT(*) FROM {{ ref('DWH_F_INV_ILD_B') }} WHERE F_OH_QTY > 0 AND F_OH_RTL_LCL = 0"
+                - name: "Check for inventory items missing from the Product dimension"
+                  sql: |
+                    SELECT COUNT(*)
+                    FROM {{ ref('DWH_F_INV_ILD_B') }}  INV
+                    LEFT JOIN {{ ref('DWH_D_PRD_ITM_LU') }} ITM ON INV.ITM_ID = ITM.ITM_ID
+                    WHERE ITM.ITM_ID IS NULL
+            config:
+                custom_test: true
+                sub_area_name: "Inventory On-Hand" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+                table_name_to_test: "DWH_F_INV_ILD_B"
+                where_condition: | 
+                    /* Filtering on one month of inventory data */
+                    EFF_START_DT BETWEEN (SELECT CURR_MTH_START_DT FROM DW_DWH.DWH_D_CURR_TIM_LU) AND
+                    (SELECT CURR_MTH_END_DT FROM DW_DWH.DWH_D_CURR_TIM_LU)
+        - robling_product.check_inventory_compression:
+            name: "check_for_inventory_compression_errors" # Human friendly name for the test.
+            config:
+                severity: warn
+                custom_test: true
+                sub_area_name: "Inventory On-Hand" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+                table_name_to_test: "DWH_F_INV_ILD_B"

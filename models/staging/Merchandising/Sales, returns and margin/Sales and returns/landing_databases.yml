@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: SALES_AND_RETURNS_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_F_SLS_TXN_ATTR_LU
+      - name: LND_F_SLS_TXN_LN_ITM_B
+      - name: LND_D_RSN_LU
+
+  - name: SALES_AND_RETURNS_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_F_SLS_TXN_ATTR_LU
+      - name: LND_F_SLS_TXN_LN_ITM_B
+      - name: LND_D_RSN_LU

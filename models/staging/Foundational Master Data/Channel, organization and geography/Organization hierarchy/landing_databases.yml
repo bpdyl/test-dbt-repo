@@ -1,0 +1,24 @@
+version: 2
+
+sources:
+  - name: ORG_HIER_STG_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_D_ORG_CHN_LU
+      - name: LND_D_ORG_ARA_LU
+      - name: LND_D_ORG_RGN_LU
+      - name: LND_D_ORG_DST_LU
+      - name: LND_D_ORG_CHNL_LU
+      - name: LND_D_ORG_LOC_LU
+  
+  - name: ORG_HIER_STG_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_D_ORG_CHN_LU
+      - name: LND_D_ORG_ARA_LU
+      - name: LND_D_ORG_RGN_LU
+      - name: LND_D_ORG_DST_LU
+      - name: LND_D_ORG_CHNL_LU
+      - name: LND_D_ORG_LOC_LU

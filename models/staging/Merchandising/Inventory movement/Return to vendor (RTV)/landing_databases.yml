@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: INVENTORY_MOVEMENT_RTV_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_F_INV_RTV_SUP_ILD_B
+
+  - name: INVENTORY_MOVEMENT_RTV_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_F_INV_RTV_SUP_ILD_B

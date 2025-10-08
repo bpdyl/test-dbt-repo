@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: INV_TXN_SRC
+    schema: DW_STG_V
+    tables:
+      - name: V_RECON_F_INV_TXN_ILD_B
+      - name: V_STG_F_INV_TXN_ILD_B
+  - name: INV_TXN_DWH
+    schema: DW_DWH
+    tables:
+      - name: DWH_F_INV_TXN_ILD_B
+  - name: INV_TXN_DM
+    schema: DM_MERCH
+    tables:
+      - name: DM_F_MEAS_FACT_ILD_B
+  - name: INV_TXN_CFG_LU
+    schema: DW_CFG
+    tables:
+      - name: CFG_INV_TXN_LU
+  - name: MIN_OF_DAY_LU
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_D_TIM_MIN_OF_DAY_LU
+  - name: EXCHG_RATE_LU
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_EXCH_RATE_LU

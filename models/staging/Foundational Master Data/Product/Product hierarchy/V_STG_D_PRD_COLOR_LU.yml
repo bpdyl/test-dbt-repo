@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_COLOR_LU
+    description: "Staging view for Product Color Lookup table."
+    columns:
+      - name: COLOR_ID
+        description: "Unique identifier in the source system for the Color. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: COLOR_NUM
+        description: "Identifier for the Color displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: COLOR_DESC
+        description: "Description for the Color."

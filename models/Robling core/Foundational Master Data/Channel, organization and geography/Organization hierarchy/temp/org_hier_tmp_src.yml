@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: ORG_HIER_TMP_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_STG_V
+    tables:
+      - name: V_STG_D_ORG_CHN_LU
+      - name: V_STG_D_ORG_ARA_LU
+      - name: V_STG_D_ORG_RGN_LU
+      - name: V_STG_D_ORG_DST_LU
+      - name: V_STG_D_ORG_CHNL_LU
+      - name: V_STG_D_ORG_LOC_LU

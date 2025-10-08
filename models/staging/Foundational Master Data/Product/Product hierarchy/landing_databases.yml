@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: PRD_HIER_STG_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_D_PRD_DIV_LU
+      - name: LND_D_PRD_GRP_LU
+      - name: LND_D_PRD_DPT_LU
+      - name: LND_D_PRD_CLS_LU
+      - name: LND_D_PRD_SBC_LU
+      - name: LND_D_PRD_STY_LU
+      - name: LND_D_PRD_COLOR_LU
+      - name: LND_D_PRD_SIZE_LU
+      - name: LND_D_PRD_ITM_LU
+      - name: LND_D_PRD_STY_IMG_LU
+      - name: LND_D_SUP_LU
+      - name: LND_D_PRD_SIZE_SORT_NUM_LU
+  
+  - name: PRD_HIER_STG_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_D_PRD_DIV_LU
+      - name: LND_D_PRD_GRP_LU
+      - name: LND_D_PRD_DPT_LU
+      - name: LND_D_PRD_CLS_LU
+      - name: LND_D_PRD_SBC_LU
+      - name: LND_D_PRD_STY_LU
+      - name: LND_D_PRD_COLOR_LU
+      - name: LND_D_PRD_SIZE_LU
+      - name: LND_D_PRD_ITM_LU
+      - name: LND_D_PRD_STY_IMG_LU
+      - name: LND_D_SUP_LU
+      - name: LND_D_PRD_SIZE_SORT_NUM_LU

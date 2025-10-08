@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_CLS_LU
+    description: "Staging view for Product Class Lookup Table"
+    columns:
+      - name: CLS_ID
+        description: "Unique identifier in the source system for the Class. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: CLS_NUM
+        description: "Identifier for the Class displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: CLS_DESC
+        description: "Description for the Class."
+      - name: DPT_ID
+        description: "Unique identifier in the source system for the Department. The Robling ETL will join on this column."

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: CUSTOMER_FULFILLMENT_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_D_ECOMM_FULFILL_TYP_LU
+      - name: LND_F_ECOMM_DO_HDR_B
+      - name: LND_F_ECOMM_DO_LN_ITM_B
+
+  - name: CUSTOMER_FULFILLMENT_SRC_CHG
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_D_ECOMM_FULFILL_TYP_LU
+      - name: LND_F_ECOMM_DO_HDR_B
+      - name: LND_F_ECOMM_DO_LN_ITM_B

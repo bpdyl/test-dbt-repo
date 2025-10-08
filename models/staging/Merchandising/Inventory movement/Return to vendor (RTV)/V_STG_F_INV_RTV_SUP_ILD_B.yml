@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: V_STG_F_INV_RTV_SUP_ILD_B
+    description: "Staging view for Return to Vendor (RTV) Inventory Movement Table"
+    columns:
+      - name: POST_DT
+        description: "Date when the RTV was posted to the source system (usually Merch). Sometimes known as Business Date."
+      - name: TXN_DT
+        description: "Date when the RTV occurred."
+      - name: LOC_ID
+        description: "Unique identifier in the source system for the location from which the RTV was executed. The Robling ETL will join on this column."
+      - name: SUP_ID
+        description: "Unique identifier in the source system for the Vendor to whom the merchandise is being returned. The Robling ETL will join on this column."
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item returned to the Vendor. The Robling ETL will join on this column."
+      - name: RTV_RSN
+        description: "Code or Description of the RTV reason."
+      - name: F_RTV_QTY
+        description: "Quantity (in units) of product returned to vendor."
+      - name: F_RTV_CST_LCL
+        description: "Cost valuation of product returned to vendor, usually based on Weighted Average Cost (WAC), in local currency."
+      - name: F_RTV_RTL_LCL
+        description: "Retail valuation of product returned to vendor, usually based on Weighted Average Retail (WAC), in local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code."

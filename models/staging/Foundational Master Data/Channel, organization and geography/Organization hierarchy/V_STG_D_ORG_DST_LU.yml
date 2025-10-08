@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_DST_LU
+    description: "Staging view for Organization District Lookup Table"
+    columns:
+      - name: DST_ID
+        description: "Unique identifier in the source system for the District. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: DST_NUM
+        description: "Identifier for the District displayed to users and reports. May or may not be the same as the ID."
+      - name: DST_DESC
+        description: "Description for the District."
+      - name: RGN_ID
+        description: "Unique identifier in the source system for the Region. The Robling ETL will join on this column."
+      - name: DST_MGR_NAME
+        description: "District Manager."

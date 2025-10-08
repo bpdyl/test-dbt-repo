@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: DWH_F_INV_RTV_SUP_ILD_B
+    tags: ['f_inv_rtv_sup_ild_ld']
+    description: "Fact table for holding Inventory return to vendor data."
+    data_tests:
+      - robling_product.run_general_integrity_checks: ## Actual name of the test.
+          name: general_data_integrity_checks # Human friendly name for the test.
+          foreign_key_checks:
+              - column_name: "LOC_ID"
+                parent_table: "DWH_D_ORG_LOC_LU"
+                parent_pk_column: "LOC_ID"
+              - column_name: "ITM_ID"
+                parent_table: "DWH_D_PRD_ITM_LU"
+                parent_pk_column: "ITM_ID"
+          key_fields:
+              - POST_DT
+              - TXN_DT
+              - LOC_ID
+              - SUP_ID
+              - ITM_ID
+              - RTV_RSN
+              - F_RTV_QTY
+              - F_RTV_CST_LCL
+              - F_RTV_RTL_LCL
+              - LCL_CNCY_CDE
+          config:
+              severity: warn
+              custom_test: true
+              sub_area_name: "RTV" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+              table_name_to_test: "DWH_F_INV_RTV_SUP_ILD_B"

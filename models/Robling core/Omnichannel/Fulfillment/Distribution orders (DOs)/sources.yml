@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: DO_RECON_SRC_STG
+    schema: DW_STG_V
+    tables:
+      - name: V_RECON_F_ECOMM_DO_LN_ITM_B
+      - name: V_STG_F_ECOMM_DO_LN_ITM_B
+
+  - name: DO_RECON_SRC_DWH
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_ECOMM_DO_LN_ITM_B
+      - name: V_DWH_F_ECOMM_DO_HDR_B
+      - name: V_DWH_F_ECOMM_CO_LN_ITM_B
+
+  - name: DO_TMP_UPD_SRC
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_INV_ILD_B
+
+
+  - name: DO_RECON_SRC_DM
+    schema: DM_MERCH
+    tables:
+      - name: DM_F_MEAS_FACT_ILD_B
+
+  - name: DO_DWH_V
+    schema: DW_DWH_V
+    tables: 
+      - name: V_DWH_F_ECOMM_DO_HDR_B
+      - name: V_DWH_F_ECOMM_DO_LN_ITM_B

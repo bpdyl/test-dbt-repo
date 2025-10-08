@@ -1,0 +1,81 @@
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+#https://docs.getdbt.com/reference/dbt_project.yml
+
+#Often an organization has one dbt project, so it is sensible to name a project with your organization's name
+name: "robling_product"
+
+#https://docs.getdbt.com/reference/project-configs/version
+version: "1.0.0"
+
+#Without this configuration, dbt will assume your dbt_project.yml uses the version 2
+#syntax. Version 1 was deprecated in dbt v0.19.0.
+config-version: 2
+
+# The profile your dbt project should use to connect to your data warehouse.
+# Not applicable for dbt cloud
+# The profile mentioned here should be present in the profiles.yml file.
+# profiles.yml can have multiple profiles defined in it. DBT uses the profile mentioned here.
+profile: "robling_snowflake"
+
+# Adds query at the end of every sql statement executed through DBT.
+# This is helpful in tracking queries executed by DBT in Snowflake environment.
+# Append: True adds the comment at the end of every SQL statement.
+query-comment:
+  comment: "Query executed by Robling DBT framework"
+  append: True
+
+vars:
+  PRIMARY_CNCY_CDE: USD
+  # Surrogate Key Type Options
+  # MD5
+  # Sequence
+  SURROGATE_KEY_TYPE: "MD5"
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths:
+  [
+    "macros",
+    "models/Robling core/Merchandising/Sales, returns and margin/Sales and returns/macros",
+    "models/Robling core/Merchandising/Inventory owned/Inventory on hand/macros",
+    "models/Robling core/Merchandising/Inventory movement/Inventory transfers/macros",
+    "models/Robling core/Omnichannel/Demand/Customer orders (COs)/macros",
+    "models/Robling core/Omnichannel/Fulfillment/Distribution orders (DOs)/macros",
+    "models/Robling core/Merchandising/Inventory movement/Return to vendor (RTV)/macros"
+  ]
+snapshot-paths: ["snapshots"]
+
+#clean-targets:         # directories to be removed by `dbt clean`
+#  - "target"
+# - "dbt_packages"
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+# To apply a configuration to all models in your project only, use your project name as the <resource-path>
+# Configuration can be applied to all models inside subdirectory as well.
+# Configuration can be applied to a specific sql file inside project name as well.asset-paths:
+# https://docs.getdbt.com/reference/resource-configs/resource-path
+models:
+  robling_product:
+    # Config indicated by + and applies to all files under models/example/
+    Staging:
+      +schema: DW_STG_V
+      +materialized: view
+
+on-run-end: "{{ update_batch_log_on_failure(results) }}"
+
+# Setting the default severity for all the data tests as 'warn' which will only ever return a warning, and not cause errors
+# so that the failure on data tests will be handled from custom integrity check framework 
+data_tests:
+  +severity: warn  # all tests

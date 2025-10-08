@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: RTV_RECON_SRC_STG
+    schema: DW_STG_V
+    tables:
+      - name: V_RECON_F_INV_RTV_SUP_ILD_B
+      - name: V_STG_F_INV_RTV_SUP_ILD_B
+
+  - name: RTV_RECON_SRC_DWH
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_INV_RTV_SUP_ILD_B
+
+  - name: RTV_RECON_SRC_DM
+    schema: DM_MERCH
+    tables:
+      - name: DM_F_MEAS_FACT_ILD_B
+
+  - name: RTV_SRC_DM
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_INV_RTV_SUP_ILD_B
+
+  - name: RTV_TMP_UPD_SRC
+    schema: DW_DWH_V
+    tables:
+      - name: V_DWH_F_INV_ILD_B

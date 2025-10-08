@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_ITM_LU
+    description: "Staging view for Product Item Lookup Table"
+    columns:
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: ITM_NUM
+        description: "Identifier for the Item displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: ITM_DESC
+        description: "Description for the Item."

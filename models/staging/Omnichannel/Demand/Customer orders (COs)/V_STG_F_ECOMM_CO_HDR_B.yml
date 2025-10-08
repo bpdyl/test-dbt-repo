@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: V_STG_F_ECOMM_CO_HDR_B
+    description: "Staging view for eCommerce Customer Order Header"
+    columns:
+      - name: CO_ID
+        description: "Unique identifier in the source system for the ecomm Customer Order. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: CO_NUM
+        description: "Identifier for the ecomm Customer Order displayed to users and reports. May or may not be the same as the ID."
+      - name: CO_HDR_STTS
+        description: "Code or Description of the Customer Order status, such as ordered, backordered, fulfilled, canceled, etc.."
+      - name: DMND_LOC_ID
+        description: "Unique identifier in the source system for the location where the order was placed. The Robling ETL will join on this column."
+      - name: CO_ORD_TS
+        description: "Timestamp when the customer order is officially considered demand, usually upon order check out."
+      - name: F_CO_ORD_RTL_LCL
+        description: "Retail amount charged to the customer for product only, net of discounts but not including shipping, taxes or fees, in local currency."
+      - name: F_CO_DSC_AMT_LCL
+        description: "Product discounts applied to merchandise ordered, not including discounts on shipping or other fees, in local currency."
+      - name: F_CO_TAX_AMT_LCL
+        description: "Tax amounts applied to merchandise ordered, not including taxes on shipping or other fees, in local currency."
+      - name: F_CO_SHIPPING_RTL_LCL
+        description: "Shipping fees charged to the customer, in local currency."
+      - name: F_CO_SHIPPING_CST_LCL
+        description: "Shipping costs incurred by the retailer in fulfilling the order, in local currency."
+      - name: F_CO_HDR_ADDTNL_CHRGS_LCL
+        description: "Additional charges to the customer (apart from shipping and tax charges) applied at the customer order header level, in local currency."
+      - name: F_CO_LN_ADDTNL_CHRGS_LCL
+        description: "Additional charges to the customer (apart from shipping and tax charges) applied at the customer order line item level, in local currency."
+      - name: F_CO_ORD_TOT_AMT_LCL
+        description: "Total amount in an order, including all charges such as S&H, in local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code."
+      - name: SRC_UPD_TS
+        description: "Timestamp when this record was last modified at the source system."
+      - name: IS_DELETED
+        description: "Indicates whether this record is marked as deleted at the source."

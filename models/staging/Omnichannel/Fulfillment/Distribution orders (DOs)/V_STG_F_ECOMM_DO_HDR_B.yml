@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: V_STG_F_ECOMM_DO_HDR_B
+    description: "Staging view for eCommerce Customer Fulfillment Header"
+    columns:
+      - name: DO_ID
+        description: "Unique identifier in the source system for the eComm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: DO_NUM
+        description: "Identifier for the eComm Distribution Order (AKA fulfillment) displayed to users and reports. May or may not be the same as the ID."
+      - name: CO_ID
+        description: "Unique identifier in the source system for the eComm Customer Order. The Robling ETL will join on this column."
+      - name: FULMNT_LOC_ID
+        description: "Unique identifier in the source system for the location fulfilling the order, which is the shipping location for shipped orders and the pick-up location for pick-up at store.. The Robling ETL will join on this column."
+      - name: INV_SRC_LOC_ID
+        description: "Unique identifier in the source system for the location supplying the inventory to fulfill a customer order. Usually the fulfilling store, unless inventory is transferred from a separate location to be picked up at the fulfilling location. The Robling ETL will join on this column."
+      - name: DO_HDR_STTS
+        description: "Code or Description of the Distribution Order status, such as released, fulfilled, canceled, etc.."
+      - name: DO_CREATED_TS
+        description: "Timestamp when the distribution order was created in source system. The order line is considered allocated at this point."
+      - name: DO_INVOICE_TS
+        description: "Timestamp when the OMS system issued an invoice for this distribution order (also known as fulfillment). The DO is considered fulfilled at this time."
+      - name: DO_INVOICE_ID
+        description: "Unique identifier in the source system for the invoice issued by the source system upon fulfilling. The Robling ETL will join on this column."
+      - name: FULFILL_TYP
+        description: "The fulfillment type, such as 'Ship to Store', 'Ship to Home', or 'BOPIS'."
+      - name: DO_BOPIS_FLG
+        description: "Indicates whether or not the fulfillment is BOPIS (Buy Online Pickup In Store)."
+      - name: F_DO_DUTY_AMT_LCL
+        description: "The duty amount assessed for importing the product for this fulfillment, in local currency."
+      - name: F_DO_SHIPPING_CST_LCL
+        description: "The cost incurred by the retailer for shipping the order, in local currency."
+      - name: LCL_CNCY_CDE
+        description: "Local currency code."
+      - name: SRC_UPD_TS
+        description: "Timestamp when this record was last modified at the source system."
+      - name: IS_DELETED
+        description: "Indicates whether this record is marked as deleted at the source."

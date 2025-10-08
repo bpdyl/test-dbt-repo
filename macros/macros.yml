@@ -1,0 +1,215 @@
+version: 2
+
+macros:
+  - name: get_job_detail
+    description: Retrieves the module type and job ID for a given script name from the batch scripts configuration.
+    arguments:
+      - name: script_name
+        type: string
+        description: Name of the script to look up.
+
+  - name: get_business_date
+    description: Retrieves the current business date from the DWH_C_PARAM table.
+    arguments: []
+
+  - name: get_batch_id
+    description: Retrieves the maximum batch ID for a specified module from the batch log.
+    arguments:
+      - name: module_typ
+        type: string
+        description: The module type to look up.
+
+  - name: get_last_run_status
+    description: Retrieves the last execution status for a job on a specific business date.
+    arguments:
+      - name: job_id
+        type: string
+        description: The job identifier.
+      - name: curr_day
+        type: date
+        description: The business date to check.
+
+  - name: start_script
+    description: Initializes a new batch execution for a script by creating a batch log entry.
+    arguments:
+      - name: script_name
+        type: string
+        description: Name of the script to execute.
+      - name: status
+        type: string
+        description: Initial status for the batch.
+      - name: bookmark
+        type: string
+        description: Initial bookmark value.
+
+  - name: log_script_success
+    description: Marks a script execution as successfully completed in the batch log.
+    arguments:
+      - name: this
+        type: dbt.node
+        description: Current model reference.
+
+  - name: get_model_config_values
+    description: Retrieves configuration values for a given dbt model.
+    arguments:
+      - name: model_ref
+        type: dbt.node
+        description: Reference to the dbt model.
+
+  - name: log_dml_audit
+    description: Records DML activity details in the audit log, including row counts and operation type.
+    arguments:
+      - name: this
+        type: dbt.node
+        description: Current model reference.
+      - name: source
+        type: relation
+        description: Source table reference.
+      - name: activity_type
+        type: string
+        description: Type of DML operation (INSERT, UPDATE, MERGE, DELETE).
+
+  - name: check_recon_variance
+    description: >
+      This macro performs data reconciliation checks between two source systems for a given fact type.
+      It queries the reconciliation table (DW_DWH.DWH_F_RECON_LD) and computes variance percentages
+      for FACT_QTY, FACT_CST_LCL, and FACT_RTL_LCL. If any variance falls outside the acceptable range,
+      it raises an exception.
+    arguments:
+      - name: fact_typ
+        type: string
+        description: The fact type to check (e.g., 'Sales', 'Inventory').
+      - name: curr_day
+        type: date
+        description: Current business date for the reconciliation check.
+      - name: recon_step
+        type: integer
+        description: >
+          Reconciliation step identifier:
+          0 = Compare LND and STG,
+          1 = Compare STG_V and DWH,
+          2 = Compare DWH and DM.
+      - name: validation_range
+        type: list
+        description: >
+          Two-element list containing the lower and upper acceptable variance 
+          percentage bounds (e.g., [-1, 1] for ±1%).
+
+  - name: load_recon_data
+    description: >
+      This macro orchestrates the reconciliation process for a given subject area and reconciliation step.
+      It reads configuration, cleans existing reconciliation data, loads new data, and validates the results.
+    arguments:
+      - name: fact_typ
+        type: string
+        description: The fact type/subject area to reconcile (e.g., 'Sales', 'Inventory').
+      - name: recon_config_macro
+        type: string
+        description: Name of the macro that provides reconciliation configuration.
+      - name: recon_step
+        type: integer
+        description: >
+          Reconciliation step identifier (default=0):
+          0 = Compare LND and STG,
+          1 = Compare STG_V and DWH,
+          2 = Compare DWH and DM.
+      - name: src_system
+        type: string
+        description: Source system identifier if needed to override config (optional).
+
+  - name: generate_hash_expression
+    description: >
+      Generates a hash expression for a given set of columns in a table.
+    arguments:
+      - name: alias
+        type: string
+        description: The table alias to use for column references.
+      - name: columns
+        type: list
+        description: The list of columns to generate the hash expression for.
+
+  - name: generate_merge_statement
+    description: >
+      Generates a SQL merge statement for merging data from a source dataset into a target table.
+      This macro is designed to be used within a custom materialization and cannot be used independently.
+    arguments:
+      - name: target_relation
+        type: relation
+        description: Fully qualified target table (db.schema.table).
+      - name: key_columns
+        type: list
+        description: List of columns used for the matching condition (Primary keys).
+      - name: hash_columns
+        type: list
+        description: List of columns that should be part of the hash check (all non-key columns).
+      - name: insert_columns
+        type: list
+        description: List of columns that should be part of the insert statement.
+
+  - name: mac_f_sls_recon_script_sql
+    description: >
+      Generates a YAML configuration for sales reconciliation steps, including SQL commands for each step.
+        This configuration is used to load data from different source systems into the reconciliation table.
+        Reconciliation check macro will use this configuration to perform the reconciliation check.
+    arguments: []
+  - name: generate_schema_name
+    description: >
+      Customizes the schema name generation for dbt models. This macro overrides the default dbt behavior
+      to allow for custom schema naming logic. It uses the target schema as a base and appends the custom
+      schema name if provided.
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: The configured value of schema in the specified node, or none if not supplied.
+      - name: node
+        type: "dict e.g. {\"name\": \"my_model\", \"resource_type\": \"model\",...}"
+        description: The node that is currently being processed by dbt, containing metadata about the model.
+
+  - name: get_run_id
+    description: Retrieves the current run ID for a specific job execution.
+    arguments:
+      - name: job_id
+        type: string
+        description: The job identifier for which to retrieve the run ID.
+
+  - name: update_batch_log_on_failure
+    description: Updates the batch log with failure details for a specific job execution.
+    arguments:
+      - name: run results metadata provided by dbt
+        type: list
+        description: List of results from the dbt run to log failures.
+  
+  - name: close_dimension_using_temp
+    description: |
+      This macro updates dimension records in the target table that no longer exist in the temp table 
+      by setting RCD_CLOSE_FLG to 1 and RCD_CLOSE_DT to current business date.
+    arguments:
+      - name: target_table
+        type: string
+        description: The target dimension table to update.
+      - name: temp_table
+        type: string
+        description: The temporary table containing current records.
+      - name: dim_key_column
+        type: string
+        description: The surrogate key column (e.g., CHN_KEY for Chain dimension).
+
+  - name: update_closed_dimension_using_rollup
+    description: >
+      This macro updates closed dimension records with the latest values from the rollup table.
+      It is used in hierarchical dimensions to ensure that parent attribute changes are propagated
+      to closed child records, maintaining data consistency across the hierarchy.
+    arguments:
+      - name: target_table
+        type: string
+        description: The target dimension table to update.
+      - name: rollup_table
+        type: string
+        description: The rollup table containing the parent dimension data.
+
+  - name: mac_f_co_recon_script_sql
+    description: >
+      Generates a YAML configuration for customer order reconciliation steps, including SQL commands for each step.
+        This configuration is used to load data from different source systems into the reconciliation table.
+        Reconciliation check macro will use this configuration to perform the reconciliation check.
+    arguments: []

@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+    - name: CFG_RIG_RECAP_SRC
+      schema: DM_MERCH
+      tables:
+        - name: DM_F_MEAS_FACT_ILD_B
+    

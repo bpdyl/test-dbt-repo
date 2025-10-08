@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: DWH_F_ECOMM_CO_LN_ITM_B
+    tags: ['f_ecomm_co_ln_itm_ld']
+    description: "Fact table for customer order detail."
+    data_tests:
+      - robling_product.run_general_integrity_checks: ## Actual name of the test.
+          name: general_data_integrity_checks # Human friendly name for the test.
+          primary_key_columns: ["CO_ID", "CO_LN_ID"]
+          foreign_key_checks:
+              - column_name: "DMND_LOC_ID"
+                parent_table: "DWH_D_ORG_LOC_LU"
+                parent_pk_column: "LOC_ID"
+              - column_name: "ITM_ID"
+                parent_table: "DWH_D_PRD_ITM_LU"
+                parent_pk_column: "ITM_ID"
+          key_fields:
+              - CO_LN_NUM
+              - ITMLOC_STTS_CDE
+              - CO_LN_ITM_STTS
+              - CO_ORD_DT
+              - CO_ORD_MIN_KEY
+              - CO_ORD_TS
+              - F_CO_ORD_QTY
+              - CANCLD_DT
+              - CANCLD_MIN_KEY
+              - CANCLD_TS
+              - F_CO_CANCLD_QTY
+              - RTRN_DT
+              - RTRN_MIN_KEY
+              - RTRN_TS
+              - DLVRY_STATE
+              - DLVRY_POSTAL_CDE
+              - DLVRY_COUNTRY_CDE
+              - F_CO_PAID_UNIT_RTL
+              - F_CO_PAID_UNIT_RTL_LCL
+              - F_CO_UNIT_CST
+              - F_CO_UNIT_CST_LCL
+              - F_CO_ORD_CST
+              - F_CO_ORD_CST_LCL
+              - F_CO_ORD_RTL
+              - F_CO_ORD_RTL_LCL
+              - F_CO_DSC_AMT
+              - F_CO_DSC_AMT_LCL
+              - LCL_CNCY_CDE
+              - IS_DELETED
+          optional_fields:
+              - CANCLD_RSN
+              - RTRN_RSN
+              - F_CO_RTRN_QTY
+              - DLVRY_TYP
+              - DLVRY_CITY
+              - F_CO_ORIG_UNIT_RTL
+              - F_CO_ORIG_UNIT_RTL_LCL
+              - F_CO_TAX_AMT
+              - F_CO_TAX_AMT_LCL
+              - F_CO_LN_ADDTNL_CHRGS
+              - F_CO_LN_ADDTNL_CHRGS_LCL
+              - F_CO_LN_ORD_TOT_AMT
+              - F_CO_LN_ORD_TOT_AMT_LCL
+              - SRC_UPD_TS
+          config:
+              severity: warn
+              custom_test: true
+              sub_area_name: "Customer Order" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+              table_name_to_test: "DWH_F_ECOMM_CO_LN_ITM_B"
+
+      - robling_product.run_custom_sql_checks: ## Actual name of the test.
+          name: "check_missing_dmnd_cost" # Human friendly name for the test.
+          custom_sql_tests:
+              - name: "Check for Demand data for which cost wasn''t found by the ETL"
+                sql: |
+                  SELECT count_if(zeroifnull(length(src.F_CO_UNIT_CST_LCL )) = 0 ) 
+                  FROM {{ ref('DWH_F_ECOMM_CO_LN_ITM_B') }} SRC 
+                  LEFT OUTER JOIN DW_DWH.DWH_F_INV_ILD_B INV
+                  ON SRC.ITM_ID =INV.ITM_ID
+                  AND SRC.DMND_LOC_ID = INV.LOC_ID
+                  -- Using Beginning-of-Day WAC to update Demand Cost
+                  AND SRC.CO_ORD_DT - 1 BETWEEN INV.EFF_START_DT and INV.EFF_END_DT
+          config:
+              severity: warn
+              custom_test: true
+              sub_area_name: "Customer Order" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+              table_name_to_test: "DWH_F_ECOMM_CO_LN_ITM_B"

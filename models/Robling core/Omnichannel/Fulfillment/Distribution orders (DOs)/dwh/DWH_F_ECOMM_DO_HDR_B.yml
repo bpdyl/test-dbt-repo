@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: DWH_F_ECOMM_DO_HDR_B
+    tags: ['f_ecomm_do_hdr_ld']
+    description: "Fact table for customer fulfillment header detail."
+    data_tests:
+      - robling_product.run_general_integrity_checks: ## Actual name of the test.
+          name: general_data_integrity_checks # Human friendly name for the test.
+          primary_key_columns: ["DO_ID"]
+          foreign_key_checks:
+              - column_name: "CO_ID"
+                parent_table: "DWH_F_ECOMM_CO_HDR_B"
+                parent_pk_column: "CO_ID"
+              - column_name: "FULMNT_LOC_ID"
+                parent_table: "DWH_D_ORG_LOC_LU"
+                parent_pk_column: "LOC_ID"
+#              - column_name: "INV_SRC_LOC_ID"
+#                parent_table: "DWH_D_ORG_LOC_LU"
+#                parent_pk_column: "LOC_ID"
+          key_fields:
+              - DO_NUM
+              - DO_HDR_STTS
+              - DO_CREATED_DT
+              - DO_CREATED_MIN_KEY
+              - DO_CREATED_TS
+              - DO_INVOICE_DT
+              - DO_INVOICE_MIN_KEY
+              - DO_INVOICE_TS
+              - FULFILL_TYP
+              - F_DO_SHIPPING_CST
+              - F_DO_SHIPPING_CST_LCL
+              - LCL_CNCY_CDE
+              - IS_DELETED
+          optional_fields:
+              - DO_INVOICE_ID
+              - DO_BOPIS_FLG
+              - F_DO_DUTY_AMT
+              - F_DO_DUTY_AMT_LCL
+              - SRC_UPD_TS
+          config:
+              severity: warn
+              custom_test: true
+              sub_area_name: "Fulfillment" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+              table_name_to_test: "DWH_F_ECOMM_DO_HDR_B"

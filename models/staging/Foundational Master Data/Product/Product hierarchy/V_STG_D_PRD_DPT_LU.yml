@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_DPT_LU
+    description: "Staging view for Product Department Lookup Table"
+    columns:
+      - name: DPT_ID
+        description: "Unique identifier in the source system for the Department. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: DPT_NUM
+        description: "Identifier for the Department displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: DPT_DESC
+        description: "Description for the Department."

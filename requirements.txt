@@ -1,0 +1,8 @@
+dbt-core
+dbt-snowflake
+azure-identity
+azure-keyvault
+azure-storage-blob
+sendgrid
+pandas
+python-dotenv

@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: INVENTORY_OH_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND_CHG
+    tables:
+      - name: LND_F_INV_IL_B

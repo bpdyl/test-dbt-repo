@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_LOC_LU
+    description: "Staging view for Organization Location Lookup Table"
+    columns:
+      - name: LOC_ID
+        description: "Unique identifier in the source system for the Location. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: LOC_NUM
+        description: "Identifier for the Location displayed to users and reports. May or may not be the same as the ID."
+      - name: LOC_DESC
+        description: "Description for the Location."
+      - name: DST_ID
+        description: "Unique identifier in the source system for the District. The Robling ETL will join on this column."
+      - name: CHNL_ID
+        description: "Unique identifier in the source system for the Channel. The Robling ETL will join on this column."
+      - name: LOC_MGR_NAME
+        description: "Store or DC Manager."
+      - name: LOC_CNCY_CDE
+        description: "Reason code for the Location Currency Code."
+      - name: LOC_TYP_CDE
+        description: "Reason code for the Location type, such as 'S' (Store), 'W' (Warehouse)."
+      - name: LOC_TYP_CDE_DESC
+        description: "Description for the Location type, such as 'S' (Store), 'W' (Warehosue)."
+      - name: LOC_POSTAL_CDE
+        description: "Reason code for the Location Postal/ZIP code."
+      - name: LOC_STATE_PROVINCE_CDE
+        description: "Reason code for the Location State/Province."
+      - name: LOC_COUNTRY_CDE
+        description: "Reason code for the Location Country."
+      - name: LOC_FMT_CDE
+        description: "Reason code for the Location format, such as mall, stand-alone, flagship."
+      - name: LOC_DEFAULT_WH_NUM
+        description: "Default Warehouse Number."
+      - name: LOC_OPEN_DT
+        description: "Store Open Date."
+      - name: LOC_CLOSE_DT
+        description: "Store Last Remodeled Date."

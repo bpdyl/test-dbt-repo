@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: V_STG_D_ORG_RGN_LU
+    description: "Staging view for Organization Region Lookup Table"
+    columns:
+      - name: RGN_ID
+        description: "Unique identifier in the source system for the Region. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: RGN_NUM
+        description: "Identifier for the Region displayed to users and reports. May or may not be the same as the ID."
+      - name: RGN_DESC
+        description: "Description for the Region."
+      - name: ARA_ID
+        description: "Unique identifier in the source system for the Area. The Robling ETL will join on this column."
+      - name: RGN_MGR_NAME
+        description: "Region Manager."

@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: V_STG_D_PRD_SIZE_LU
+    description: "Staging view for Product Size Lookup Table"
+    columns:
+      - name: SIZE_ID
+        description: "Unique identifier in the source system for the Size. The Robling ETL will join on this column."
+        tests:
+          - unique
+          - not_null
+      - name: SIZE_NUM
+        description: "Identifier for the Size displayed to users and reports. May or may not be the same as the ID."
+        tests:
+          - not_null
+      - name: SIZE_DESC
+        description: "Description for the Size."
+      - name: SIZE_SORT_NUM
+        description: "Sort order for Sizes displayed in the front end and in reports.. Example: XS = 1, S = 2, M = 3, L=4"
