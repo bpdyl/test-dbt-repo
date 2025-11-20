@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: V_STG_RIG_F_INV_FCST_ILD_B
+    description: "Fact table that holds forecasts for out of stock inventory at the item/location/day level."
+    columns:
+      - name: DAY_KEY
+        description: "Robling-generated surrogate key that uniquely identifies the Date."
+        tests:
+          - not_null
+
+      - name: LOC_ID
+        description: "Unique identifier in the source system for the Location. The Robling ETL will join on this column."
+        tests:
+          - not_null
+
+      - name: ITM_ID
+        description: "Unique identifier in the source system for the Item. The Robling ETL will join on this column."
+        tests:
+          - not_null
+
+      - name: F_RIG_FCST_QTY
+        description: "Quantity (in units) of forecast for out of stock inventory."
+
+      - name: F_RIG_FCST_CST_LCL
+        description: "Cost valuation of forecast for out of stock inventory, usually based on Weighted Average Cost (WAC), in local currency."
+
+      - name: F_RIG_FCST_RTL_LCL
+        description: "Retail valuation of forecast for out of stock inventory, in local currency."
+
+      - name: LCL_CNCY_CDE
+        description: "Local currency code"
+
+    tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [DAY_KEY, ITM_ID, LOC_ID]

@@ -6,3 +6,9 @@ sources:
     schema: DW_LND
     tables:
       - name: LND_RIG_F_INV_ELGBL_IL_B
+    
+  - name: FCST_STG_SRC
+    database: ROBLING_SRC_DATA_DB
+    schema: DW_LND
+    tables:
+      - name: LND_RIG_F_INV_FCST_IL_B

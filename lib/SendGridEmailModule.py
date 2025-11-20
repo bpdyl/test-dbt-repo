@@ -32,7 +32,7 @@ class SendGridEmailModule:
             to_emails=recipient_email_list,
             subject=subject,
             html_content=msg)
-        print('SG API KEY',cls.__sendgrid_api_key)
+
         sg_client = SendGridAPIClient(cls.__sendgrid_api_key)
         sg_client.send(message)
 

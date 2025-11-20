@@ -8,16 +8,10 @@ models:
         description: "Date of receiving the inventory snapshot."
       - name: LOC_ID
         description: "Unique identifier in the source system for the Location."
-        tests:
-          - not_null
       - name: ITM_ID
         description: "Unique identifier in the source system for the Item."
-        tests:
-          - not_null
       - name: ITMLOC_STTS_CDE
         description: "Retail price status code for this item at this location, such as 'R' for Regular and 'C' for Clearance."
-        tests:
-          - not_null
       - name: LOC_TYP_CDE
         description: "Reason code for the location type, such as 'S' for store and 'W' for warehouse."
       - name: F_OH_QTY
@@ -40,7 +34,35 @@ models:
         description: "Promotional Unit Retail Price of the item, including temporary/promotional price reductions, in local currency."
       - name: LCL_CNCY_CDE
         description: "Local currency code."
-    tests:
+    data_tests:
       # Test that the combination of the following columns is unique (i.e. forms the primary key)
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [LOC_ID, ITM_ID]
+      - robling_product.run_general_integrity_checks:
+          name: general_data_integrity_checks
+          primary_key_columns: ["LOC_ID", "ITM_ID","EFF_START_DT"]
+          foreign_key_checks:
+            - column_name: "LOC_ID"
+              parent_table: "DWH_D_ORG_LOC_LU"
+              parent_pk_column: "LOC_ID"
+            - column_name: "ITM_ID"
+              parent_table: "DWH_D_PRD_ITM_LU"
+              parent_pk_column: "ITM_ID"
+          key_fields:
+            - ITMLOC_STTS_CDE
+            - F_OH_QTY
+            - F_OH_CST_LCL
+            - F_OH_RTL_LCL
+            - F_IT_RTL_LCL
+            - F_UNIT_WAC_CST_LCL
+            - F_UNIT_RTL_LCL
+            - LCL_CNCY_CDE
+          optional_fields:
+            - F_IT_QTY
+            - F_IT_CST_LCL
+            - F_REG_UNIT_RTL_LCL
+            - F_PROMO_RTL_LCL
+          config:
+            custom_test: true
+            sub_area_name: "Inventory On-Hand"
+            table_name_to_test: "V_STG_F_INV_ILD_B"

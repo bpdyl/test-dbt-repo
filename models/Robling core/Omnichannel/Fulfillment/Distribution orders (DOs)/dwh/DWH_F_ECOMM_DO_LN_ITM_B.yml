@@ -45,12 +45,12 @@ models:
             sub_area_name: "Fulfillment" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
             table_name_to_test: "DWH_F_ECOMM_DO_LN_ITM_B"
             # Override default severity mapping
-            custom_severity_mapping: 
+            custom_severity_mapping:
               PK violations: "Critical"
               FK violations: "Critical"
               Single-snapshot violations: "Warning"
               Key Field: "Warning"
-              Optional Field: "Informational"
+              Optional Field: "Notice"
 
       - robling_product.run_custom_sql_checks: ## Actual name of the test.
           name: "check_missing_fulfillment_cost" # Human friendly name for the test.

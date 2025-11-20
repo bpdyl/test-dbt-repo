@@ -14,3 +14,4 @@ package-lock.yml
 .env
 .python-version
 dbt_internal_packages/
+dbt-venv

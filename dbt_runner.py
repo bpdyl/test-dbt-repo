@@ -255,7 +255,7 @@ def run_dbt_commands(
             integrity_callbacks = (
                 [integrity_log_callback, integrity_check_callback]
                 if var.get("CONFIG_LOCATION") == "2"
-                else [integrity_log_callback,integrity_check_callback]
+                else [integrity_log_callback]
             )
 
             integrity_log_handler.logger.info(f"Running Data Integrity Checks for tag: {tag_name}")

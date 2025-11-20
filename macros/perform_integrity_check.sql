@@ -34,15 +34,13 @@
 
     {# Define severity mapping for different test types #}
     {%- set severity_config = config.get('custom_severity_mapping', default= {
-        'Total Records': 'Informational',
+        'Total Records': 'Notice',
         'PK violations': 'Critical',
         'FK violations': 'Critical',
         'Single-snapshot violations': 'Warning',
         'Key Field': 'Warning',
-        'Optional Field': 'Informational'
+        'Optional Field': 'Notice'
     }) -%}
-    {% do log('table name to test Mapping: '~table_name_to_test,info=True)%}
-    {% do log('Severity Mapping: '~severity_config,info=True)%}
     
     {# Create the relation(full namespace of the table) so that it can be queried 
     This handles cases where `table_name_to_test` might be explicitly provided or defaults to the model's identifier.#}
@@ -188,8 +186,8 @@
             WHEN "Test Condition" LIKE '%FK violations%' THEN '{{ severity_config.get("FK violations", "Critical") }}'
             WHEN "Test Condition" LIKE '%Single-snapshot%' THEN '{{ severity_config.get("Single-snapshot violations", "Warning") }}'
             WHEN "Test Condition" LIKE '%(Key Field)%' THEN '{{ severity_config.get("Key Field", "Warning") }}'
-            WHEN "Test Condition" LIKE '%(Optional Field)%' THEN '{{ severity_config.get("Optional Field", "Informational") }}'
-            ELSE '{{ severity_config.get("Total Records", "Informational") }}'
+            WHEN "Test Condition" LIKE '%(Optional Field)%' THEN '{{ severity_config.get("Optional Field", "Notice") }}'
+            ELSE '{{ severity_config.get("Total Records", "Notice") }}'
         END                                     AS SEVERITY,
         CURRENT_TIMESTAMP                       AS RCD_INS_TS,
         CURRENT_TIMESTAMP                       AS RCD_UPD_TS
@@ -206,7 +204,7 @@
         CASE SEVERITY
             WHEN 'Critical' THEN 1
             WHEN 'Warning' THEN 2
-            WHEN 'Informational' THEN 3
+            WHEN 'Notice' THEN 3
             ELSE 4
         END,
         TEST_DESC

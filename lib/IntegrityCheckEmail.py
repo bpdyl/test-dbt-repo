@@ -68,7 +68,7 @@ class IntegrityCheckEmail:
                         color: #b78905;
                     }
                     
-                    .informational {
+                    .notice {
                         
                         color: #0c5460;
                     }
@@ -151,7 +151,7 @@ class IntegrityCheckEmail:
         severity_counts = {
             'Critical': [],
             'Warning': [],
-            'Informational': []
+            'Notice': []
         }
         
         for test in failed_tests:
@@ -166,8 +166,8 @@ class IntegrityCheckEmail:
             return 'Critical'
         elif severity_counts['Warning']:
             return 'Warning'
-        elif severity_counts['Informational']:
-            return 'Informational'
+        elif severity_counts['Notice']:
+            return 'Notice'
         else:
             return 'Success'
 
@@ -180,7 +180,7 @@ class IntegrityCheckEmail:
         
         critical_count = len(severity_counts['Critical'])
         warning_count = len(severity_counts['Warning'])
-        info_count = len(severity_counts['Informational'])
+        info_count = len(severity_counts['Notice'])
         
         email_subject = f'FAILURE! :: {self.EXEC_ENV} Critical integrity issues for {sub_area}/{table_name} on {business_date}'
         
@@ -191,7 +191,7 @@ class IntegrityCheckEmail:
                        f'Summary of failures:<br/>' \
                        f'• <strong style="color: #721c24;">Critical: {critical_count}</strong><br/>' \
                        f'• Warning: {warning_count}<br/>' \
-                       f'• Informational: {info_count}<br/><br/>' \
+                       f'• Notice: {info_count}<br/><br/>' \
                        f'These critical issues may invalidate reporting and affect downstream processes.<br/><br/>' \
                        f'Detailed results:'
         
@@ -214,7 +214,7 @@ class IntegrityCheckEmail:
         violations = integrity_json["violations"]
         
         warning_count = len(severity_counts['Warning'])
-        info_count = len(severity_counts['Informational'])
+        info_count = len(severity_counts['Notice'])
         
         email_subject = f'WARNING :: {self.EXEC_ENV} Integrity warnings for {sub_area}/{table_name} on {business_date}'
         
@@ -223,7 +223,7 @@ class IntegrityCheckEmail:
                        f'for <strong>{sub_area}/{table_name}</strong>.<br/><br/>' \
                        f'Summary of issues:<br/>' \
                        f'• Warning: {warning_count}<br/>' \
-                       f'• Informational: {info_count}<br/><br/>' \
+                       f'• Notice: {info_count}<br/><br/>' \
                        f'These issues may impact data quality but don\'t necessarily affect core functionality.<br/><br/>' \
                        f'Detailed results:'
         
@@ -239,18 +239,18 @@ class IntegrityCheckEmail:
         SendGridEmailModule.send_email(email_subject, email_message, self.INTEGRITY_EMAIL_LIST.split(','))
 
     def send_informational_email(self, integrity_json, severity_counts):
-        """Send informational email for Informational severity failures only"""
+        """Send notice email for Notice severity failures only"""
         sub_area = integrity_json["sub_area_name"]
         table_name = integrity_json["table_name"]
         business_date = integrity_json["business_date"]
         violations = integrity_json["violations"]
         
-        info_count = len(severity_counts['Informational'])
+        info_count = len(severity_counts['Notice'])
         
-        email_subject = f'ℹINFO :: {self.EXEC_ENV} Informational notices for {sub_area}/{table_name} on {business_date}'
+        email_subject = f'ℹINFO :: {self.EXEC_ENV} Notice notices for {sub_area}/{table_name} on {business_date}'
         
         email_message = f'Hi all,<br/><br/>' \
-                       f'Robling found <strong style="color: #0c5460;">{info_count} Informational</strong> notice(s) ' \
+                       f'Robling found <strong style="color: #0c5460;">{info_count} Notice</strong> notice(s) ' \
                        f'for <strong>{sub_area}/{table_name}</strong>.<br/><br/>' \
                        f'These are tracked for completeness but don\'t impact functionality.<br/><br/>' \
                        f'Detailed results:'
@@ -260,7 +260,7 @@ class IntegrityCheckEmail:
         
         # Add dashboard link
         email_message = email_message + f'<br/><br/>' \
-                       f'View detailed analysis: <a href="https://{self.INTEGRITY_DOMAIN}/{self.DASHBOARD}?Table={table_name}&Date={business_date}&Severity=Informational">Full Report</a>'
+                       f'View detailed analysis: <a href="https://{self.INTEGRITY_DOMAIN}/{self.DASHBOARD}?Table={table_name}&Date={business_date}&Severity=Notice">Full Report</a>'
         
         email_message = email_message + self._get_email_footer()
         
@@ -294,13 +294,13 @@ class IntegrityCheckEmail:
     def send_integrity_email(self, integrity_json):
         """Main method to determine which type of email to send based on severity analysis"""
         
-        # Sort violations - failures first by severity (Critical > Warning > Informational), 
+        # Sort violations - failures first by severity (Critical > Warning > Notice), 
         # then by violation count descending
         def sort_key(violation):
             severity_priority = {
                 'Critical': 1,
                 'Warning': 2, 
-                'Informational': 3
+                'Notice': 3
             }
             severity = violation.get('severity', 'Warning')
             violation_count = int(violation.get('integrity_chk_violation_row_cnt', 0))
@@ -322,8 +322,8 @@ class IntegrityCheckEmail:
         elif email_priority == 'Warning':
             print(f"Warning level integrity issues found - sending warning email")
             self.send_warning_email(integrity_json, severity_counts)
-        elif email_priority == 'Informational':
-            print(f"Informational integrity notices found - sending info email")
+        elif email_priority == 'Notice':
+            print(f"Notice integrity notices found - sending info email")
             self.send_informational_email(integrity_json, severity_counts)
         else:
             print("All integrity checks passed - sending success email")

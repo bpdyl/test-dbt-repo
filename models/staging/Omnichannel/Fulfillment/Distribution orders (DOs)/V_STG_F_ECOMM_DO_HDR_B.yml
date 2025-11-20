@@ -6,9 +6,6 @@ models:
     columns:
       - name: DO_ID
         description: "Unique identifier in the source system for the eComm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
-        tests:
-          - unique
-          - not_null
       - name: DO_NUM
         description: "Identifier for the eComm Distribution Order (AKA fulfillment) displayed to users and reports. May or may not be the same as the ID."
       - name: CO_ID
@@ -39,3 +36,35 @@ models:
         description: "Timestamp when this record was last modified at the source system."
       - name: IS_DELETED
         description: "Indicates whether this record is marked as deleted at the source."
+    data_tests:
+      # Test that the combination of the following columns is unique (i.e. forms the primary key)
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [DO_ID]
+      - robling_product.run_general_integrity_checks:
+          name: general_data_integrity_checks
+          primary_key_columns: ["DO_ID"]
+          foreign_key_checks:
+            - column_name: "CO_ID"
+              parent_table: "DWH_F_ECOMM_CO_HDR_B"
+              parent_pk_column: "CO_ID"
+            - column_name: "FULMNT_LOC_ID"
+              parent_table: "DWH_D_ORG_LOC_LU"
+              parent_pk_column: "LOC_ID"
+          key_fields:
+            - DO_NUM
+            - DO_HDR_STTS
+            - DO_CREATED_TS
+            - DO_INVOICE_TS
+            - FULFILL_TYP
+            - F_DO_SHIPPING_CST_LCL
+            - LCL_CNCY_CDE
+            - IS_DELETED
+          optional_fields:
+            - DO_INVOICE_ID
+            - DO_BOPIS_FLG
+            - F_DO_DUTY_AMT_LCL
+            - SRC_UPD_TS
+          config:
+            custom_test: true
+            sub_area_name: "Fulfillment"
+            table_name_to_test: "V_STG_F_ECOMM_DO_HDR_B"

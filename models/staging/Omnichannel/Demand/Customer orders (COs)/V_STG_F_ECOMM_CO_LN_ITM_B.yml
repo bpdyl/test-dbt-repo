@@ -6,12 +6,8 @@ models:
     columns:
       - name: CO_LN_ID
         description: "Unique identifier in the source system for the ecomm Customer Order Line. The Robling ETL will join on this column."
-        tests:
-          - not_null
       - name: CO_ID
         description: "Unique identifier in the source system for the ecomm Customer Order. The Robling ETL will join on this column."
-        tests:
-          - not_null
       - name: CO_LN_NUM
         description: "Identifier for the ecomm Customer Order Line displayed to users and reports. May or may not be the same as the ID."
       - name: DMND_LOC_ID
@@ -82,7 +78,48 @@ models:
         description: "Timestamp when this record was last modified at the source system."
       - name: IS_DELETED
         description: "Indicates whether this record is marked as deleted at the source."
-    tests:
+    data_tests:
       # Test that the combination of the following columns is unique (i.e. forms the primary key)
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [CO_LN_ID, CO_ID]
+      - robling_product.run_general_integrity_checks:
+          name: general_data_integrity_checks
+          primary_key_columns: ["CO_ID", "CO_LN_ID"]
+          foreign_key_checks:
+            - column_name: "DMND_LOC_ID"
+              parent_table: "DWH_D_ORG_LOC_LU"
+              parent_pk_column: "LOC_ID"
+            - column_name: "ITM_ID"
+              parent_table: "DWH_D_PRD_ITM_LU"
+              parent_pk_column: "ITM_ID"
+          key_fields:
+            - CO_LN_NUM
+            - CO_LN_ITM_STTS
+            - CO_ORD_TS
+            - F_CO_ORD_QTY
+            - CANCLD_TS
+            - F_CO_CANCLD_QTY
+            - RTRN_TS
+            - DLVRY_STATE
+            - DLVRY_POSTAL_CDE
+            - DLVRY_COUNTRY_CDE
+            - F_CO_PAID_UNIT_RTL_LCL
+            - F_CO_ORD_RTL_LCL
+            - F_CO_DSC_AMT_LCL
+            - LCL_CNCY_CDE
+            - IS_DELETED
+          optional_fields:
+            - CANCLD_RSN
+            - RTRN_RSN
+            - F_CO_RTRN_QTY
+            - DLVRY_TYP
+            - DLVRY_CITY
+            - F_CO_ORIG_UNIT_RTL_LCL
+            - F_CO_TAX_AMT_LCL
+            - F_CO_LN_ADDTNL_CHRGS_LCL
+            - F_CO_LN_ORD_TOT_AMT_LCL
+          config:
+            severity: warn
+            custom_test: true
+            sub_area_name: "Customer Order" # Match the sub_area_name to FACT_TYP of Recon table to maintain consistency
+            table_name_to_test: "V_STG_F_ECOMM_CO_LN_ITM_B"

@@ -37,6 +37,7 @@ from azure.identity import ClientSecretCredential
 from azure.storage.blob import BlobServiceClient
 from azure.keyvault.secrets import SecretClient
 from azure.core.exceptions import ResourceNotFoundError
+from azure.core.pipeline.policies import RetryPolicy
 from lib.DBTSnowflakeConn import DbtSnowflakeConnectionManager
 from lib.Variables import Variables
 
@@ -135,8 +136,9 @@ def create_secret_client():
     """
     azure_credential = get_azure_credentials()
     try:
+        policy = RetryPolicy(retry_count=5)
         vault_url = os.environ["VAULT_URL"]
-        return SecretClient(vault_url=vault_url, credential=azure_credential)
+        return SecretClient(vault_url=vault_url, credential=azure_credential, retry_policy=policy)
     except KeyError as e:
         print("Azure environment variables not set. Exiting.")
         raise e
@@ -169,7 +171,6 @@ def prepare_env_vars():
     env_path = os.environ.get("ROBLING_DBT_DIR") + "/.env"
     if os.path.exists(env_path):
         load_dotenv(env_path, override=True)
-        print(f"SG API KEY inside prepare env vars: {os.getenv('SENDGRID_API_KEY')}")
     else:
         print(
             "No .env file found in the root directory. Skipping environment variable loading."

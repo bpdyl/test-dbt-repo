@@ -48,7 +48,8 @@ macro-paths:
     "models/Robling core/Merchandising/Inventory movement/Inventory transfers/macros",
     "models/Robling core/Omnichannel/Demand/Customer orders (COs)/macros",
     "models/Robling core/Omnichannel/Fulfillment/Distribution orders (DOs)/macros",
-    "models/Robling core/Merchandising/Inventory movement/Return to vendor (RTV)/macros"
+    "models/Robling core/Merchandising/Inventory movement/Return to vendor (RTV)/macros",
+    "models/Robling core/Business Insights/RIG/RIG Essentials/macros",
   ]
 snapshot-paths: ["snapshots"]
 
@@ -76,6 +77,6 @@ models:
 on-run-end: "{{ update_batch_log_on_failure(results) }}"
 
 # Setting the default severity for all the data tests as 'warn' which will only ever return a warning, and not cause errors
-# so that the failure on data tests will be handled from custom integrity check framework 
+# so that the failure on data tests will be handled from custom integrity check framework
 data_tests:
-  +severity: warn  # all tests
+  +severity: warn # all tests

@@ -6,12 +6,8 @@ models:
     columns:
       - name: DO_ID
         description: "Unique identifier in the source system for the ecomm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
-        tests:
-          - not_null
       - name: DO_LN_ID
         description: "Unique identifier in the source system for the line item within the ecomm Distribution Order (AKA fulfillment). The Robling ETL will join on this column."
-        tests:
-          - not_null
       - name: DO_LN_NUM
         description: "Identifier for the line item within the ecomm Distribution Order (AKA fulfillment) displayed to users and reports. May or may not be the same as the ID."
       - name: CO_ID
@@ -40,7 +36,46 @@ models:
         description: "Timestamp when this record was last modified at the source system."
       - name: IS_DELETED
         description: "Indicates whether this record is marked as deleted at the source."
-    tests:
+    data_tests:
       # Test that the combination of the following columns is unique (i.e. forms the primary key)
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns: [DO_LN_ID]
+      - robling_product.run_general_integrity_checks:
+          name: general_data_integrity_checks
+          primary_key_columns: ["DO_LN_ID"]
+          foreign_key_checks:
+            - column_name: "DO_ID"
+              parent_table: "DWH_F_ECOMM_DO_HDR_B"
+              parent_pk_column: "DO_ID"
+            - column_name: "CO_ID"
+              parent_table: "DWH_F_ECOMM_CO_HDR_B"
+              parent_pk_column: "CO_ID"
+            - column_name: "CO_LN_ID"
+              parent_table: "DWH_F_ECOMM_CO_LN_ITM_B"
+              parent_pk_column: "CO_LN_ID"
+            - column_name: "ITM_ID"
+              parent_table: "DWH_D_PRD_ITM_LU"
+              parent_pk_column: "ITM_ID"
+          key_fields:
+            - DO_LN_NUM
+            - DO_LN_STTS
+            - F_DO_CURR_QTY
+            - F_FULFILL_QTY
+            - LCL_CNCY_CDE
+            - IS_DELETED
+          optional_fields:
+            - F_DO_ORIG_QTY
+            - F_DO_CANCLD_QTY
+            - F_DO_TAX_AMT_LCL
+            - F_DO_LN_ORD_TOT_AMT_LCL
+            - SRC_UPD_TS
+          config:
+            custom_test: true
+            sub_area_name: "Fulfillment"
+            table_name_to_test: "V_STG_F_ECOMM_DO_LN_ITM_B"
+            custom_severity_mapping:
+              PK violations: "Critical"
+              FK violations: "Critical"
+              Single-snapshot violations: "Warning"
+              Key Field: "Warning"
+              Optional Field: "Notice"
