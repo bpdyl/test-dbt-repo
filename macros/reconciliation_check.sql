@@ -24,7 +24,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro check_recon_variance(fact_typ,curr_day, recon_step, validation_range, format_description, recon_post_dt_filter) %}
+{% macro check_recon_variance(
+    fact_typ,
+    curr_day,
+    recon_step,
+    validation_range,
+    format_description,
+    recon_post_dt_filter,
+    no_data_warning=False
+) %}
     {# 
         OVERVIEW:
         This macro performs data reconciliation checks between two source systems for a given fact type.
@@ -111,6 +119,7 @@
 
     {% if execute %}
         {% set checkpoint = robling_product.get_recon_checkpoint() %}
+        {% set model_name = (this.name if this is defined and this is not none else 'unknown_model') %}
         {{ log("Running variance check query:\n", info=True) }}
         {% set result = run_query(query) %}
         {% if not result or result | length == 0 %}
@@ -126,6 +135,74 @@
 
         {{ log("Found variance columns: " ~ var_columns | string, info=True) }}
         {% set row = result.rows[0] %}
+        {% set no_data_message = "No reconciliation data found for " ~ fact_typ ~ " on " ~ curr_day %}
+
+        {# Determine which columns indicate "no data" (rtl and unt columns) #}
+        {% set no_data_columns = [] %}
+        {% for col in col_names %}
+            {% if col.endswith('_RTL') or col.endswith('_UNT') %}
+                {% do no_data_columns.append(col) %}
+            {% endif %}
+        {% endfor %}
+
+        {% set all_zero = True %}
+        {% for col in no_data_columns %}
+            {% set val = row[col] | float %}
+            {% if val != 0 %}
+                {% set all_zero = False %}
+            {% endif %}
+        {% endfor %}
+
+        {# If all RTL/UNT columns are zero, treat as NO DATA and raise/emit accordingly #}
+        {% if no_data_columns | length > 0 and all_zero %}
+            {% set json_result = {
+                "fact_type": fact_typ,
+                "current_day": curr_day | string,
+                "checkpoint": checkpoint,
+                "source_systems": {
+                    "system1": src_system1,
+                    "system2": src_system2
+                },
+                "format_description": format_description,
+                "validation_range": {
+                    "lower": lower,
+                    "upper": upper
+                },
+                "results": {
+                    "unt": {
+                        "system1_value": row.get(src_system1 ~ "_UNT", 0.0) | float,
+                        "system2_value": row.get(src_system2 ~ "_UNT", 0.0) | float,
+                        "difference": row.get("DIFF_UNT", 0.0) | float,
+                        "variance_percent": row.get("VAR_PERCENT_UNT", 0.0) | float
+                    },
+                    "cst": {
+                        "system1_value": row.get(src_system1 ~ "_CST", 0.0) | float,
+                        "system2_value": row.get(src_system2 ~ "_CST", 0.0) | float,
+                        "difference": row.get("DIFF_CST", 0.0) | float,
+                        "variance_percent": row.get("VAR_PERCENT_CST", 0.0) | float
+                    },
+                    "rtl": {
+                        "system1_value": row.get(src_system1 ~ "_RTL", 0.0) | float,
+                        "system2_value": row.get(src_system2 ~ "_RTL", 0.0) | float,
+                        "difference": row.get("DIFF_RTL", 0.0) | float,
+                        "variance_percent": row.get("VAR_PERCENT_RTL", 0.0) | float
+                    }
+                },
+                "status": "warning" if no_data_warning else "failure",
+                "warning_code": "RECON_NO_DATA" if no_data_warning else None,
+                "warning_message": no_data_message if no_data_warning else None,
+                "model_name": model_name,
+                "no_data_warning_enabled": no_data_warning
+            } %}
+            {{ log("RECON_JSON_RESULT: " ~ json_result | tojson, info=True) }}
+            {% if no_data_warning %}
+                {{ log("No reconciliation data found. Raising warning to skip downstream models.", info=True) }}
+                {{ exceptions.raise_compiler_error("RECON_NO_DATA_WARNING: " ~ fact_typ ~ " (" ~ model_name ~ ")") }}
+            {% else %}
+                {{ exceptions.raise_compiler_error(no_data_message) }}
+            {% endif %}
+        {% endif %}
+
         {% set out_of_range = [] %}
 
         {% for col in var_columns %}
@@ -170,7 +247,11 @@
                 }
             },
             "status": "success" if out_of_range | length == 0 else "failure",
-            "out_of_range_columns": out_of_range
+            "out_of_range_columns": out_of_range,
+            "warning_code": None,
+            "warning_message": None,
+            "model_name": model_name,
+            "no_data_warning_enabled": no_data_warning
         } %}
         {# Here RECON_JSON_RESULT acts as the key for the json which is later captured from the
             dbt_runner script in order to parse it and send the reconciliation email  #}
@@ -217,6 +298,7 @@
         {% set subject_config = config_dict.get(fact_typ) %}
         {# Get the custom post date filter from the recon YAML config, if it exists. #}
         {% set recon_post_dt_filter = subject_config.get('recon_post_dt_filter') %}
+        {% set no_data_warning = subject_config.get('no_data_warning', False) %}
         
         {# Find all matching entries #}
         {% set recon_entries = [] %}
@@ -262,7 +344,15 @@
         {% set range_parts = validation_range_str.split(',') %}
         {% set validation_range = [range_parts[0]|float, range_parts[1]|float] %}
 
-        {{ robling_product.check_recon_variance(fact_typ,curr_day,recon_step, validation_range, format_description, recon_post_dt_filter) }}
+        {{ robling_product.check_recon_variance(
+            fact_typ,
+            curr_day,
+            recon_step,
+            validation_range,
+            format_description,
+            recon_post_dt_filter,
+            no_data_warning
+        ) }}
 
         {{ return('') }}
     {% endif %}

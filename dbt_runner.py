@@ -125,6 +125,7 @@ def run_dbt_commands(
         else [main_log_callback]
     )
 
+    skip_due_to_no_data = False
     try:
         # Run dbt test (only if a staging view is provided)
         if staging_view_name:
@@ -159,7 +160,7 @@ def run_dbt_commands(
             if not (stg_run_result.success and test_result.success):
                 # BASE ERROR MESSAGE CONSTRUCTION
                 error_msg = f"Operation failed for {staging_view_name}: \
-                        {stg_run_result.exception if not stg_run_result.success else test_result.exception}"
+                        {test_result.exception if stg_run_result.success else stg_run_result.exception}"
                 # EXCEPTION HANDLING PRIORITY:
                 # 1. Check for direct exceptions first (critical failures)
                 if stg_run_result.exception or test_result.exception:
@@ -222,16 +223,33 @@ def run_dbt_commands(
         run_result = dbtRunner(callbacks=main_callbacks).invoke(dbt_run_command)
 
         if not run_result.success:
-            error_msg = f"Run failed for script {tag_name}"
+            warning_message = None
             if run_result.exception:
-                error_msg += f": {str(run_result.exception)}"
-            elif run_result.result:
-                # Get all error messages from result object
-                res_msgs = [
-                    res.message for res in run_result.result.results if res.message
-                ]
-                error_msg += f": {str(res_msgs)}"
-            raise RuntimeError(error_msg)
+                exception_message = str(run_result.exception)
+                # Check if the exception message contains the RECON_NO_DATA_WARNING token
+                if 'RECON_NO_DATA_WARNING' in exception_message:
+                    # If the exception message contains the RECON_NO_DATA_WARNING token, set the skip_due_to_no_data flag to True
+                    skip_due_to_no_data = True
+                    warning_message = exception_message
+            if skip_due_to_no_data:
+                log_handler.logger.warning(
+                    f"Skipping tag {tag_name} because no reconciliation data was available. Detail: {warning_message}"
+                )
+            else:
+                error_msg = f"Run failed for script {tag_name}"
+                if run_result.exception:
+                    error_msg += f": {str(run_result.exception)}"
+                elif run_result.result:
+                    # Get all error messages from result object
+                    res_msgs = [
+                        res.message for res in run_result.result.results if res.message
+                    ]
+                    error_msg += f": {str(res_msgs)}"
+                raise RuntimeError(error_msg)
+        if skip_due_to_no_data:
+            if var.get("CONFIG_LOCATION") == "2":
+                copy_log_to_archive_container(log_file)
+            return
         log_handler.logger.info(
             f"Successfully executed dbt commands for tag: {tag_name}"
         )
