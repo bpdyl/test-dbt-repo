@@ -24,15 +24,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro check_recon_variance(
-    fact_typ,
-    curr_day,
-    recon_step,
-    validation_range,
-    format_description,
-    recon_post_dt_filter,
-    no_data_warning=False
-) %}
+{% macro check_recon_variance(fact_typ,curr_day, recon_step, validation_range, format_description, recon_post_dt_filter, no_data_warning=False) %}
     {# 
         OVERVIEW:
         This macro performs data reconciliation checks between two source systems for a given fact type.
@@ -119,11 +111,43 @@
 
     {% if execute %}
         {% set checkpoint = robling_product.get_recon_checkpoint() %}
-        {% set model_name = (this.name if this is defined and this is not none else 'unknown_model') %}
         {{ log("Running variance check query:\n", info=True) }}
         {% set result = run_query(query) %}
+        {{ log("Result length: "~ (result | length) ~" and result: "~result, info=True) }}
         {% if not result or result | length == 0 %}
-            {{ exceptions.raise_compiler_error("No reconciliation data found for " ~ fact_typ ~ " on " ~ curr_day) }}
+            {{log('No data warning above: '~no_data_warning,info=True)}}
+            {# If no data found, handle based on no_data_warning flag. If true, emit a JSON result with status 'no_data' and do NOT raise an error. Otherwise raise as before. #}
+            {% if no_data_warning ==True %}
+                {{log('No data warning here: '~no_data_warning,info=True)}}
+                {% set json_result = {
+                    "fact_type": fact_typ,
+                    "current_day": curr_day | string,
+                    "checkpoint": checkpoint,
+                    "source_systems": {
+                        "system1": 'LND' if recon_step == 0 else ('STG_V' if recon_step == 1 else 'DWH'),
+                        "system2": 'STG_V' if recon_step == 0 else ('DWH' if recon_step == 1 else 'DM')
+                    },
+                    "format_description": format_description,
+                    "validation_range": {
+                        "lower": validation_range[0],
+                        "upper": validation_range[1]
+                    },
+                    "results": {
+                        "unt": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0},
+                        "cst": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0},
+                        "rtl": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0}
+                    },
+                    "status": "no_data",
+                    "no_data_warning": true,
+                    "out_of_range_columns": [] ,
+                    "log_file_name": var('log_file_name') if var('log_file_name') is defined else ''
+                } %}
+                {{ log("RECON_JSON_RESULT: " ~ json_result | tojson, info=True) }}
+                {{ log("No reconciliation data found for " ~ fact_typ ~ " on " ~ curr_day ~ ". Emitting no-data warning JSON and continuing.", info=True) }}
+                {{ return(json_result) }}
+            {% else %}
+                {{ exceptions.raise_compiler_error("No reconciliation data found for " ~ fact_typ ~ " on " ~ curr_day) }}
+            {% endif %}
         {% endif %}
         {% set col_names = result.column_names %}
         {% set var_columns = [] %}
@@ -135,26 +159,19 @@
 
         {{ log("Found variance columns: " ~ var_columns | string, info=True) }}
         {% set row = result.rows[0] %}
-        {% set no_data_message = "No reconciliation data found for " ~ fact_typ ~ " on " ~ curr_day %}
+        {% set out_of_range = [] %}
 
-        {# Determine which columns indicate "no data" (rtl and unt columns) #}
-        {% set no_data_columns = [] %}
-        {% for col in col_names %}
-            {% if col.endswith('_RTL') or col.endswith('_UNT') %}
-                {% do no_data_columns.append(col) %}
-            {% endif %}
-        {% endfor %}
+        {# Check if all relevant columns are zero (no data case) #}
+        {% set all_zero = (
+            row[src_system1 ~ "_UNT"] | float == 0 and
+            row[src_system2 ~ "_UNT"] | float == 0 and
+            row[src_system1 ~ "_CST"] | float == 0 and
+            row[src_system2 ~ "_CST"] | float == 0 and
+            row[src_system1 ~ "_RTL"] | float == 0 and
+            row[src_system2 ~ "_RTL"] | float == 0
+        ) %}
 
-        {% set all_zero = True %}
-        {% for col in no_data_columns %}
-            {% set val = row[col] | float %}
-            {% if val != 0 %}
-                {% set all_zero = False %}
-            {% endif %}
-        {% endfor %}
-
-        {# If all RTL/UNT columns are zero, treat as NO DATA and raise/emit accordingly #}
-        {% if no_data_columns | length > 0 and all_zero %}
+        {% if all_zero and no_data_warning %}
             {% set json_result = {
                 "fact_type": fact_typ,
                 "current_day": curr_day | string,
@@ -169,41 +186,19 @@
                     "upper": upper
                 },
                 "results": {
-                    "unt": {
-                        "system1_value": row.get(src_system1 ~ "_UNT", 0.0) | float,
-                        "system2_value": row.get(src_system2 ~ "_UNT", 0.0) | float,
-                        "difference": row.get("DIFF_UNT", 0.0) | float,
-                        "variance_percent": row.get("VAR_PERCENT_UNT", 0.0) | float
-                    },
-                    "cst": {
-                        "system1_value": row.get(src_system1 ~ "_CST", 0.0) | float,
-                        "system2_value": row.get(src_system2 ~ "_CST", 0.0) | float,
-                        "difference": row.get("DIFF_CST", 0.0) | float,
-                        "variance_percent": row.get("VAR_PERCENT_CST", 0.0) | float
-                    },
-                    "rtl": {
-                        "system1_value": row.get(src_system1 ~ "_RTL", 0.0) | float,
-                        "system2_value": row.get(src_system2 ~ "_RTL", 0.0) | float,
-                        "difference": row.get("DIFF_RTL", 0.0) | float,
-                        "variance_percent": row.get("VAR_PERCENT_RTL", 0.0) | float
-                    }
+                    "unt": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0},
+                    "cst": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0},
+                    "rtl": {"system1_value": 0, "system2_value": 0, "difference": 0, "variance_percent": 0}
                 },
-                "status": "warning" if no_data_warning else "failure",
-                "warning_code": "RECON_NO_DATA" if no_data_warning else None,
-                "warning_message": no_data_message if no_data_warning else None,
-                "model_name": model_name,
-                "no_data_warning_enabled": no_data_warning
+                "status": "no_data",
+                "no_data_warning": true,
+                "out_of_range_columns": [],
+                "log_file_name": var('log_file_name') if var('log_file_name') is defined else ''
             } %}
             {{ log("RECON_JSON_RESULT: " ~ json_result | tojson, info=True) }}
-            {% if no_data_warning %}
-                {{ log("No reconciliation data found. Raising warning to skip downstream models.", info=True) }}
-                {{ exceptions.raise_compiler_error("RECON_NO_DATA_WARNING: " ~ fact_typ ~ " (" ~ model_name ~ ")") }}
-            {% else %}
-                {{ exceptions.raise_compiler_error(no_data_message) }}
-            {% endif %}
+            {{ log("All reconciliation columns are zero for " ~ fact_typ ~ " on " ~ curr_day ~ ". Emitting no-data warning JSON and continuing.", info=True) }}
+            {{ return(json_result) }}
         {% endif %}
-
-        {% set out_of_range = [] %}
 
         {% for col in var_columns %}
             {% set val = row[col] | float %}
@@ -247,11 +242,7 @@
                 }
             },
             "status": "success" if out_of_range | length == 0 else "failure",
-            "out_of_range_columns": out_of_range,
-            "warning_code": None,
-            "warning_message": None,
-            "model_name": model_name,
-            "no_data_warning_enabled": no_data_warning
+            "out_of_range_columns": out_of_range
         } %}
         {# Here RECON_JSON_RESULT acts as the key for the json which is later captured from the
             dbt_runner script in order to parse it and send the reconciliation email  #}
@@ -298,7 +289,6 @@
         {% set subject_config = config_dict.get(fact_typ) %}
         {# Get the custom post date filter from the recon YAML config, if it exists. #}
         {% set recon_post_dt_filter = subject_config.get('recon_post_dt_filter') %}
-        {% set no_data_warning = subject_config.get('no_data_warning', False) %}
         
         {# Find all matching entries #}
         {% set recon_entries = [] %}
@@ -341,18 +331,13 @@
             {% endfor %}
         {% set format_description = recon_entries[0].format.split(',') %}
         {% set validation_range_str = recon_entries[0].validation_range %}
+        {# Read optional no_data_warning flag from recon configuration (default False) #}
+        {% set no_data_warning = recon_entries[0].get('no_data_warning') if recon_entries[0].get('no_data_warning') is not none else false %}
+        {{log('This is no data warning flag: '~no_data_warning,info=True)}}
         {% set range_parts = validation_range_str.split(',') %}
         {% set validation_range = [range_parts[0]|float, range_parts[1]|float] %}
 
-        {{ robling_product.check_recon_variance(
-            fact_typ,
-            curr_day,
-            recon_step,
-            validation_range,
-            format_description,
-            recon_post_dt_filter,
-            no_data_warning
-        ) }}
+        {{ robling_product.check_recon_variance(fact_typ,curr_day,recon_step, validation_range, format_description, recon_post_dt_filter, no_data_warning) }}
 
         {{ return('') }}
     {% endif %}

@@ -14,7 +14,9 @@
     #}
 {%- set recon_yaml -%}
 RTV:
-    no_data_warning: true
+    missing_data_config: 
+        - skip_if_no_records: false
+          source_relation: V_STG_F_INV_RTV_SUP_ILD_B
     {# Optional subject-level override for delete filter.
         If specified, this replaces the default "LOAD_DT = curr_day" filter in load_recon_data.
         Used to handle partition-based deletes (e.g., RTV by POST_DT). #}

@@ -28,4 +28,4 @@ SELECT
         ,RTV.F_RTV_RTL_LCL                                                AS F_RTV_RTL_LCL
         ,RTV.LCL_CNCY_CDE                                                 AS LCL_CNCY_CDE
     FROM {{ source(src_name,'LND_F_INV_RTV_SUP_ILD_B') }} RTV
-    WHERE RTV.TXN_DT BETWEEN '2022-01-30' AND  '{{ curr_day }}'
+    WHERE RTV.TXN_DT BETWEEN '2022-01-30' AND  '2021-12-28'

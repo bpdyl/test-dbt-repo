@@ -4,7 +4,7 @@
         schema='DM_MERCH',
         target_table = 'DM_F_MEAS_FACT_ILD_B',
         tags = ['dm_f_inv_rtv_meas_fact_ild'],
-        fact_cde = 'RTV',
+        meta = {'recon_config_macro': 'mac_f_rtv_recon_script_sql'},
         delete_condition = "POST_DT IN (SELECT DISTINCT POST_DT FROM DW_TMP.TMP_F_INV_RTV_SUP_ILD_B)",
         pre_hook=["{{ start_script('dm_f_inv_rtv_meas_fact_ild','RUNNING','NONE') }}"],
         post_hook = ["{{ load_recon_data('RTV',recon_config_macro='mac_f_rtv_recon_script_sql', recon_step=2) }}"
@@ -46,7 +46,7 @@ WHERE (
         SRC.F_RTV_QTY <> 0
         OR SRC.F_RTV_CST <> 0
         OR SRC.F_RTV_RTL <> 0
-    )
+    ) and 1=2
 -- ordering by TXN_DT, LOC_KEY for performance through Snowflake partitioning
 ORDER BY SRC.TXN_DT
         ,SRC.LOC_KEY

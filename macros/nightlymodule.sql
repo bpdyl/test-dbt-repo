@@ -172,6 +172,62 @@
         - Creates new entry in DWH_C_BATCH_LOG if no existing run is found
         - Logs the batch initialization details
     #}
+    {% if execute %}
+    {% set recon_config_macro = model.config.meta.get('recon_config_macro', None) %}
+    {{ log('Recon config macro: ' ~ recon_config_macro, info=True) }}
+    {# Get the configuration from the subject-area specific macro safely #}
+    {% if recon_config_macro and context.get(recon_config_macro) %}
+        {% set config_callable = context.get(recon_config_macro) %}
+        {% set config_dict = config_callable() if config_callable is callable else {} %}
+    {% else %}
+        {% set config_dict = {} %}
+    {% endif %}
+    {# Convert values to a list and grab the first item (actual config object of reconciliation) safely #}
+    {% set recon_config = (config_dict.values() | list)[0] if (config_dict is mapping and config_dict | length > 0) else {} %}
+    {# Extract the fact type/key from the config_dict (first key) if available #}
+    {% set fact_typ = (config_dict.keys() | list)[0] if (config_dict is mapping and config_dict | length > 0) else None %}
+
+    {# If the recon config specifies a missing_data_config, check the source and skip early if empty #}
+    {% set missing_cfg = recon_config.get('missing_data_config', []) if recon_config is mapping else [] %}
+    {% if missing_cfg %}
+        {% set script_tag = model.config.tags[0] if (model.config.tags is defined and model.config.tags | length > 0) else model.name %}
+        {% for m in missing_cfg %}
+            {% set skip_flag = m.get('skip_if_no_records', False) if (m is mapping) else False %}
+            {% set src_view = m.get('source_relation') if (m is mapping) else None %}
+            {# Grab all models and their properties; we will pull out what we need #}
+            {% set all_models = graph.nodes.values() %}
+            {# Extract properties of the current model in this iteration #}
+            {% set model_properties = (all_models | selectattr('name', 'equalto', src_view) | list).pop() %}
+            {% set source_relation = adapter.get_relation(
+                database=model_properties.database,
+                schema=model_properties.schema,
+                identifier=src_view
+            ) %}
+            {% if skip_flag and source_relation %}
+                {% set chk_query = "SELECT COUNT(*) AS CNT FROM " ~ source_relation %}
+                {{ log('Checking missing data for relation: ' ~ source_relation, info=True) }}
+                {% set chk_res = run_query(chk_query) %}
+                {% set row_count = 0 %}
+                {% if chk_res is not none %}
+                    {% set vals = chk_res.columns[0].values() if (chk_res.columns is defined and chk_res.columns[0] is defined) else [] %}
+                    {% if vals | length > 0 %}
+                        {% set row_count = vals[0] %}
+                    {% endif %}
+                {% endif %}
+                {% if row_count | int == 0 %}
+                    {{ log('No data found in ' ~ source_relation ~ '. Raising RECON_NO_DATA_WARNING.', info=True) }}
+                    {% set exc_msg = (
+                        'RECON_NO_DATA_WARNING: '
+                        ~ 'fact_typ=' ~ (fact_typ if fact_typ else '') ~ ';'
+                        ~ 'script=' ~ script_tag ~ ';'
+                        ~ 'query=' ~ chk_query ~ ';'
+                        ~ 'reason=No records in source ' ~ source_relation
+                    ) %}
+                    {{ exceptions.raise_compiler_error(exc_msg) }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     {# Get job details for the script #}
     {% set job_details = robling_product.get_job_detail(script_name) %}
     {% set job_id = job_details.job_id %}
@@ -214,7 +270,7 @@
             '{{ bookmark }}',
             '{{ var("log_file_name","") }}'
     {% endset %}
-    {% if execute %}
+
         {{ log("Inserting batch log with query:\n", info=True) }}
         {% do run_query(batch_log) %}
     {% endif %}
@@ -407,6 +463,7 @@
         OUTPUTS:
         - Updates DWH_C_BATCH_LOG with failure status and error details if any model fails.
         - Logs the error message.
+        - Special handling: If error contains RECON_NO_DATA_WARNING, logs as success instead.
     #}
     {% if execute %}
         {% for res in results %}
@@ -418,38 +475,44 @@
                 {% if not script_name %}
                     {{ return('') }}
                 {% endif %}
-                {% set job_details = robling_product.get_job_detail(script_name) %}
-                {% set job_id = job_details.job_id %}
-                {% set batch_id = robling_product.get_batch_id() %}
-                
-                {# Fetch the latest run_id for this batch_id and job_id #}
-                {% set get_latest_run_id_query %}
-                    -- Purpose: Retrieve the latest RUN_ID for the given batch and job from the batch log (on failure)
-                    SELECT COALESCE(MAX(RUN_ID), 1) AS RUN_ID
-                    FROM DW_DWH_V.V_DWH_C_BATCH_LOG
-                    WHERE BATCH_ID = '{{ batch_id }}' 
-                    AND JOB_ID = '{{ job_id }}'
-                    AND MODULE_NAME = '{{ var("module_name","NTLY") }}'
-                {% endset %}
-
-                {% set run_id_result = run_query(get_latest_run_id_query) %}
-                {% set run_id = run_id_result.columns[0].values()[0] %}
-
                 {% set error_message = res.message.replace("'", "''") | default('SCRIPT FAILED, SEE LOG FOR DETAIL') %}
-                
-                {% set update_sql %}
-                    -- Purpose: Mark the script execution as failed in the batch log and record the error message
-                    UPDATE DW_DWH.DWH_C_BATCH_LOG
-                    SET END_TIMESTAMP = CURRENT_TIMESTAMP(),
-                        STATUS = 'ERROR',
-                        ERROR_DETAIL = '{{ error_message }}'
-                    WHERE BATCH_ID = '{{ batch_id }}' 
-                    AND JOB_ID = '{{ job_id }}' AND RUN_ID = '{{ run_id }}';
-                {% endset %}
-                
-                {% do run_query(update_sql) %}
-                {% do log("#################### End Script: Error ####################", info=True) %}
-                {% do log("Error in " ~ script_name ~ ": " ~ error_message, info=True) %}
+                {# Check if this is a RECON_NO_DATA_WARNING case #}
+                {% if 'RECON_NO_DATA_WARNING' in error_message %}
+                    {% do log("#################### Reconciliation Warning: No Data Found ####################", info=True) %}
+                    {% do log("WARNING: Reconciliation data for " ~ script_name ~" is empty. Script execution and batch log update are skipped.", info=True) %}
+                    {# do nothing #}
+                {% else %}
+                    {% set job_details = robling_product.get_job_detail(script_name) %}
+                    {% set job_id = job_details.job_id %}
+                    {% set batch_id = robling_product.get_batch_id() %}
+                    
+                    {# Fetch the latest run_id for this batch_id and job_id #}
+                    {% set get_latest_run_id_query %}
+                        -- Purpose: Retrieve the latest RUN_ID for the given batch and job from the batch log (on failure)
+                        SELECT COALESCE(MAX(RUN_ID), 1) AS RUN_ID
+                        FROM DW_DWH_V.V_DWH_C_BATCH_LOG
+                        WHERE BATCH_ID = '{{ batch_id }}' 
+                        AND JOB_ID = '{{ job_id }}'
+                        AND MODULE_NAME = '{{ var("module_name","NTLY") }}'
+                    {% endset %}
+
+                    {% set run_id_result = run_query(get_latest_run_id_query) %}
+                    {% set run_id = run_id_result.columns[0].values()[0] %}
+                    
+                    {% set update_sql %}
+                        -- Purpose: Mark the script execution as failed in the batch log and record the error message
+                        UPDATE DW_DWH.DWH_C_BATCH_LOG
+                        SET END_TIMESTAMP = CURRENT_TIMESTAMP(),
+                            STATUS = 'ERROR',
+                            ERROR_DETAIL = '{{ error_message }}'
+                        WHERE BATCH_ID = '{{ batch_id }}' 
+                        AND JOB_ID = '{{ job_id }}' AND RUN_ID = '{{ run_id }}';
+                    {% endset %}
+                    
+                    {% do run_query(update_sql) %}
+                    {% do log("#################### End Script: Error ####################", info=True) %}
+                    {% do log("Error in " ~ script_name ~ ": " ~ error_message, info=True) %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}

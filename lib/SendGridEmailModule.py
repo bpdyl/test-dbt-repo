@@ -10,8 +10,16 @@ import os
 
 from sendgrid import SendGridAPIClient, Attachment, FileContent, Mail, Email
 from lib.Variables import Variables
+from lib.utils import prepare_env_vars
 
 class SendGridEmailModule:
+    # Initialize the environment variables
+    v = Variables("ENV.cfg")
+    if v.get("CONFIG_LOCATION") == "1":
+        home_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Set root directory as environment variable so that we can use it whenever required
+        os.environ["ROBLING_DBT_DIR"] = home_dir
+        prepare_env_vars()
     __sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
     __email_from = os.environ.get('EMAIL_FROM')
     __email_from_name = os.environ.get('EMAIL_FROM_NAME')
@@ -19,7 +27,6 @@ class SendGridEmailModule:
     if not __email_from_name:
         __email_from_name = 'Robling DevOps'
 
-    v = Variables("ENV.cfg")
     __default_recipient_email_list = v.get('DEFAULT_EMAIL_RECIPIENT').split(',')
     
     @classmethod

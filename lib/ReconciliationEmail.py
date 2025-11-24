@@ -132,71 +132,35 @@ class ReconciliationEmail:
         SendGridEmailModule.send_email(email_subject, email_message,
                                       self.RECON_EMAIL_LIST.split(','))
 
-    def send_no_data_warning_email(self, json_result):
+    def send_no_data_warning_email(self, msg):
         """Send a warning email when no data is available but the load is configured to skip."""
-        curr_date = json_result["current_day"]
-        fact_typ = json_result["fact_type"]
-        checkpoint = json_result["checkpoint"]
-        warning_message = json_result.get("warning_message") or "No data was available for reconciliation."
-        src_sys1 = checkpoint[json_result["source_systems"]["system1"]]
-        src_sys2 = checkpoint[json_result["source_systems"]["system2"]]
-        email_subject = f'Warning! :: {self.EXEC_ENV} The load for {fact_typ} was skipped on {curr_date} because no data was available for reconciliation.'
-        email_message = f'Hi all,' \
-                        f'<br/>' \
-                        f'<br/>' \
-                        f'{warning_message} The downstream models were skipped as per configuration.' \
-                        f'<br/><br/>Here are the checkpoint numbers (all zeros indicate no rows were processed).'
-
-        table_html = f"""<table border="1" class="dataframe">
-                                 <thead>
-                                   <tr style="text-align: right;">
-                                     <th>Batch Date</th>
-                                     <th>Checkpoint</th>
-                                     <th>Total Retail</th>
-                                     <th>Total Cost</th>
-                                     <th>Total Units</th>
-                                     <th>Diff. Retail</th>
-                                     <th>Diff. Cost</th>
-                                     <th>Diff. Units</th>
-                                     <th>Var. % Retail</th>
-                                     <th>Var. % Cost</th>
-                                     <th>Var. % Units</th>
-                                   </tr>
-                                 </thead>
-                                 <tbody>
-                                   <tr>
-                                     <td>{curr_date}</td>
-                                     <td>{src_sys1}</td>
-                                     <td>{json_result["results"]["rtl"]["system1_value"]}</td>
-                                     <td>{json_result["results"]["cst"]["system1_value"]}</td>
-                                     <td>{json_result["results"]["unt"]["system1_value"]}</td>
-                                     <td>{json_result["results"]["rtl"]["difference"]}</td>
-                                     <td>{json_result["results"]["cst"]["difference"]}</td>
-                                     <td>{json_result["results"]["unt"]["difference"]}</td>
-                                     <td>{json_result["results"]["rtl"]["variance_percent"]}</td>
-                                     <td>{json_result["results"]["cst"]["variance_percent"]}</td>
-                                     <td>{json_result["results"]["unt"]["variance_percent"]}</td>
-                                   </tr>
-                                   <tr>
-                                     <td>{curr_date}</td>
-                                     <td>{src_sys2}</td>
-                                     <td>{json_result["results"]["rtl"]["system2_value"]}</td>
-                                     <td>{json_result["results"]["cst"]["system2_value"]}</td>
-                                     <td>{json_result["results"]["unt"]["system2_value"]}</td>
-                                     <td>{json_result["results"]["rtl"]["difference"]}</td>
-                                     <td>{json_result["results"]["cst"]["difference"]}</td>
-                                     <td>{json_result["results"]["unt"]["difference"]}</td>
-                                     <td>{json_result["results"]["rtl"]["variance_percent"]}</td>
-                                     <td>{json_result["results"]["cst"]["variance_percent"]}</td>
-                                     <td>{json_result["results"]["unt"]["variance_percent"]}</td>
-                                   </tr>
-                                 </tbody>
-                               </table>"""
-        email_message = email_message + self.style + table_html
-        email_message = email_message + \
-                        f'<br/><br/>' \
-                        f'Here is a <a href="https://{self.RECON_DOMAIN}/{self.DASHBOARD}?Metric={fact_typ}&Batch+Date={curr_date}"" > report </a> if you would like more details'
-        email_footer = f'<br/><br/>' \
+        # If caller passed a plain exception string (raised early in start_script), parse it
+        if isinstance(msg, str):
+            # Look for the RECON_NO_DATA_WARNING: ... key/value block anywhere in the message
+            import re
+            kv = {}
+            match = re.search(r'RECON_NO_DATA_WARNING:([^\n]+)', msg)
+            if match:
+                body = match.group(1)
+                parts = [p.strip() for p in body.split(';') if p.strip()]
+                for p in parts:
+                    if '=' in p:
+                        k, v = p.split('=', 1)
+                        kv[k.strip()] = v.strip()
+            fact = kv.get('fact_typ')
+            script = kv.get('script')
+            query = kv.get('query')
+            reason = kv.get('reason', 'No data available for reconciliation')
+            subject_name = fact or script or 'Unknown'
+            email_subject = f'Warning! :: {self.EXEC_ENV} Load skipped for {subject_name} due to no data in source'
+            email_message = f'Hi all,<br/><br/>'
+            email_message += f'Load for <strong>{script}</strong> was skipped because no data was found in the configured source.'
+            if reason:
+                email_message += f'<br/><br/>Reason: {reason}'
+            if query:
+                email_message += f'<br/><br/>Source check query executed:<br/><pre>{query}</pre>'
+            email_message += f'<br/><br/>This job was skipped as per configuration.'
+            email_footer = f'<br/><br/>' \
                        f'*** Please do not reply to this message because it will end up in deep ' \
                        f'abyss where it will never be read. This is an automated message sent from an unmonitored email ' \
                        f'account that is used for outgoing communication only. ***' \
@@ -209,6 +173,85 @@ class ReconciliationEmail:
                        f'Best Regards,<br/><strong><label style="color:#00BCD4">' \
                        f'Team Robling</label></strong>' \
                        f'<br/><a target="_blank" href="https://robling.io">www.robling.io</a>'
+            SendGridEmailModule.send_email(email_subject, email_message + email_footer, self.RECON_EMAIL_LIST.split(','))
+            return
+
+        # Otherwise assume msg is a dictionary produced by the reconciliation macro
+        curr_date = msg.get("current_day")
+        fact_typ = msg.get("fact_type")
+        checkpoint = msg.get("checkpoint", {})
+        warning_message = msg.get("warning_message") or "No data was available for reconciliation."
+        src_sys1 = checkpoint.get(msg.get("source_systems", {}).get("system1"), '')
+        src_sys2 = checkpoint.get(msg.get("source_systems", {}).get("system2"), '')
+        email_subject = f'Warning! :: {self.EXEC_ENV} The load for {fact_typ} was skipped on {curr_date} because no data was available for reconciliation.'
+        email_message = f'Hi all,' \
+                        f'<br/>' \
+                        f'<br/>' \
+                        f'{warning_message} The downstream models were skipped as per configuration.' \
+                        f'<br/><br/>Here are the checkpoint numbers (all zeros indicate no rows were processed).'
+
+        table_html = f"""<table border="1" class="dataframe">
+                                  <thead>
+                                    <tr style="text-align: right;">
+                                      <th>Batch Date</th>
+                                      <th>Checkpoint</th>
+                                      <th>Total Retail</th>
+                                      <th>Total Cost</th>
+                                      <th>Total Units</th>
+                                      <th>Diff. Retail</th>
+                                      <th>Diff. Cost</th>
+                                      <th>Diff. Units</th>
+                                      <th>Var. % Retail</th>
+                                      <th>Var. % Cost</th>
+                                      <th>Var. % Units</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <td>{curr_date}</td>
+                                      <td>{src_sys1}</td>
+                                      <td>{msg["results"]["rtl"]["system1_value"]}</td>
+                                      <td>{msg["results"]["cst"]["system1_value"]}</td>
+                                      <td>{msg["results"]["unt"]["system1_value"]}</td>
+                                      <td>{msg["results"]["rtl"]["difference"]}</td>
+                                      <td>{msg["results"]["cst"]["difference"]}</td>
+                                      <td>{msg["results"]["unt"]["difference"]}</td>
+                                      <td>{msg["results"]["rtl"]["variance_percent"]}</td>
+                                      <td>{msg["results"]["cst"]["variance_percent"]}</td>
+                                      <td>{msg["results"]["unt"]["variance_percent"]}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>{curr_date}</td>
+                                      <td>{src_sys2}</td>
+                                      <td>{msg["results"]["rtl"]["system2_value"]}</td>
+                                      <td>{msg["results"]["cst"]["system2_value"]}</td>
+                                      <td>{msg["results"]["unt"]["system2_value"]}</td>
+                                      <td>{msg["results"]["rtl"]["difference"]}</td>
+                                      <td>{msg["results"]["cst"]["difference"]}</td>
+                                      <td>{msg["results"]["unt"]["difference"]}</td>
+                                      <td>{msg["results"]["rtl"]["variance_percent"]}</td>
+                                      <td>{msg["results"]["cst"]["variance_percent"]}</td>
+                                      <td>{msg["results"]["unt"]["variance_percent"]}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>"""
+        email_message = email_message + self.style + table_html
+        email_message = email_message + \
+                        f'<br/><br/>' \
+                        f'Here is a <a href="https://{self.RECON_DOMAIN}/{self.DASHBOARD}?Metric={fact_typ}&Batch+Date={curr_date}"" > report </a> if you would like more details'
+        email_footer = f'<br/><br/>' \
+                        f'*** Please do not reply to this message because it will end up in deep ' \
+                        f'abyss where it will never be read. This is an automated message sent from an unmonitored email ' \
+                        f'account that is used for outgoing communication only. ***' \
+                        f'<br/><br/>' \
+                        f'For support or data requests, please visit ' \
+                        f'<a target="_blank" href="https://robling.io/askrobling/">https://robling.io/askrobling/</a> ' \
+                        f'or send a message to ' \
+                        f'<a href="mailto:askrobling@robling.io">askrobling@robling.io</a>.' \
+                        f'<br/><br/><br/>' \
+                        f'Best Regards,<br/><strong><label style="color:#00BCD4">' \
+                        f'Team Robling</label></strong>' \
+                        f'<br/><a target="_blank" href="https://robling.io">www.robling.io</a>'
 
         email_message = email_message + email_footer
         SendGridEmailModule.send_email(email_subject, email_message,

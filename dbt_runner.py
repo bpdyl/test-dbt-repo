@@ -122,7 +122,7 @@ def run_dbt_commands(
     main_callbacks = (
         [main_log_callback, reconciliation_callback]
         if var.get("CONFIG_LOCATION") == "2"
-        else [main_log_callback]
+        else [main_log_callback, reconciliation_callback]
     )
 
     skip_due_to_no_data = False
@@ -224,6 +224,7 @@ def run_dbt_commands(
 
         if not run_result.success:
             warning_message = None
+            # First check exception string if available
             if run_result.exception:
                 exception_message = str(run_result.exception)
                 # Check if the exception message contains the RECON_NO_DATA_WARNING token
@@ -231,10 +232,36 @@ def run_dbt_commands(
                     # If the exception message contains the RECON_NO_DATA_WARNING token, set the skip_due_to_no_data flag to True
                     skip_due_to_no_data = True
                     warning_message = exception_message
+
+            # dbt sometimes surfaces compiler errors / warnings as messages inside the result
+            # object rather than setting `exception`. Inspect result messages for the token as a fallback.
+            if not skip_due_to_no_data and getattr(run_result, 'result', None):
+                try:
+                    for res in run_result.result.results:
+                        msg = getattr(res, 'message', None) or str(res)
+                        if 'RECON_NO_DATA_WARNING' in msg:
+                            skip_due_to_no_data = True
+                            warning_message = msg
+                            print(f'Warning msg and skip due to no data: {warning_message} , {skip_due_to_no_data}')
+                            break
+                except Exception:
+                    # Fallback: inspect the stringified result
+                    if 'RECON_NO_DATA_WARNING' in str(run_result.result):
+                        skip_due_to_no_data = True
+                        warning_message = 'RECON_NO_DATA_WARNING found in dbt result'
+            print(f'Skip due to no data: {skip_due_to_no_data}')
             if skip_due_to_no_data:
                 log_handler.logger.warning(
                     f"Skipping tag {tag_name} because no reconciliation data was available. Detail: {warning_message}"
                 )
+                if var.get("CONFIG_LOCATION") == "1":
+                    # copy_log_to_archive_container(log_file)
+                    try:
+                        # Send a no-data warning email to notify when cloud-run skips a job
+                        ReconciliationEmail(var).send_no_data_warning_email(warning_message)
+                    except Exception as _e:
+                        log_handler.logger.exception(f"Failed to send no-data warning email: {_e}")
+                return
             else:
                 error_msg = f"Run failed for script {tag_name}"
                 if run_result.exception:
@@ -246,10 +273,6 @@ def run_dbt_commands(
                     ]
                     error_msg += f": {str(res_msgs)}"
                 raise RuntimeError(error_msg)
-        if skip_due_to_no_data:
-            if var.get("CONFIG_LOCATION") == "2":
-                copy_log_to_archive_container(log_file)
-            return
         log_handler.logger.info(
             f"Successfully executed dbt commands for tag: {tag_name}"
         )

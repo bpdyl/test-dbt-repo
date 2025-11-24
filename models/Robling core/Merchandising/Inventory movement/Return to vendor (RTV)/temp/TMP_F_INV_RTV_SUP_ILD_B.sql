@@ -3,6 +3,7 @@
     alias='TMP_F_INV_RTV_SUP_ILD_B',
     schema='DW_TMP',
     tags = ['f_inv_rtv_sup_ild_ld'],
+    meta = {'recon_config_macro': 'mac_f_rtv_recon_script_sql'},
     pre_hook=["{{ start_script('f_inv_rtv_sup_ild_ld','RUNNING','NONE') }}"
              ,"{{ load_recon_data('RTV',recon_config_macro='mac_f_rtv_recon_script_sql', recon_step=0) }}"],
     post_hook=["{{ log_dml_audit(this,ref('V_STG_F_INV_RTV_SUP_ILD_B'),'CREATE_TABLE_AS_SELECT') }}"]
